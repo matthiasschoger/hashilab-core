@@ -1,0 +1,45 @@
+http:
+  routers:
+    nomad:
+      rule: Host(`nomad.lab.home`)
+      service: nomad@file
+      entrypoints: websecure
+
+  services:
+    nomad:
+      weighted:
+        healthCheck: {}
+        services:
+        - name: nomad_master
+          weight: 10
+        - name: nomad_compute1
+          weight: 1
+        - name: nomad_compute2
+          weight: 1
+
+    nomad_master:
+      loadBalancer:
+        healthCheck:
+          path: /v1/status/leader
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "http://master.home:4646"
+
+    nomad_compute1:
+      loadBalancer:
+        healthCheck:
+          path: /v1/status/leader
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "http://compute1.home:4646"
+
+    nomad_compute2:
+      loadBalancer:
+        healthCheck:
+          path: /v1/status/leader
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "http://compute2.home:4646"

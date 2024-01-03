@@ -1,0 +1,45 @@
+http:
+  routers:
+    proxmox:
+      rule: Host(`proxmox.lab.home`)
+      service: proxmox@file
+      entrypoints: websecure
+
+  services:
+    proxmox:
+      weighted:
+        healthCheck: {}
+        services:
+        - name: proxmox0
+          weight: 10
+        - name: proxmox1
+          weight: 1
+        - name: proxmox2
+          weight: 1
+
+    proxmox0:
+      loadBalancer:
+        healthCheck:
+          path: /api2/json/access/ticket
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "https://proxmox0.home:8006"
+
+    proxmox1:
+      loadBalancer:
+        healthCheck:
+          path: /api2/json/access/ticket
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "https://proxmox1.home:8006"
+
+    proxmox2:
+      loadBalancer:
+        healthCheck:
+          path: /api2/json/access/ticket
+          interval: 5s
+          timeout: 2s
+        servers:
+          - url: "https://proxmox2.home:8006"

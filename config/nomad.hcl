@@ -1,0 +1,52 @@
+# Full configuration options can be found at https://www.nomadproject.io/docs/configuration
+
+datacenter = "home"
+data_dir  = "/opt/nomad/data"
+bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/24\" | attr \"address\" }}"
+
+server {
+  enabled = true
+  bootstrap_expect = 3
+}
+
+client {
+  enabled = true
+  servers = ["192.168.0.20", "192.168.0.30", "192.168.0.31"]
+  node_class = "compute"
+}
+
+acl {
+  enabled = true
+}
+
+consul {
+  address = "localhost:8500"
+}
+
+plugin "raw_exec" {
+  config {
+    enabled = true
+  }
+}
+
+plugin "docker" {
+  config {
+    allow_privileged = true
+    allow_caps = ["audit_write", "chown", "dac_override", "fowner", "fsetid", "kill", "mknod", "net_bind_service", "setfcap", "setgid", "setpcap", "setuid", "sys_chroot",
+                  "NET_ADMIN","NET_BROADCAST","NET_RAW"] # required by keepalived
+
+    volumes {
+      # required for bind mounting host directories
+      enabled = true
+    }
+  }
+}
+
+telemetry {
+  collection_interval = "1s"
+  disable_hostname = true
+  prometheus_metrics = true
+  publish_allocation_metrics = true
+  publish_node_metrics = true
+}
+

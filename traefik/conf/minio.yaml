@@ -1,0 +1,14 @@
+http:
+  routers:
+    minio:
+      rule: Host(`minio.lab.home`)
+      service: minio@file
+      entrypoints: websecure
+      tls: 
+        certResolver: home
+
+  services:
+    minio:
+      loadBalancer:
+        servers:
+          - url: "http://storage.home:9011"

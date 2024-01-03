@@ -1,0 +1,116 @@
+# static configuration 
+
+providers:
+  file:
+    directory: "/local/conf"
+    watch: false
+  consulcatalog:
+    prefix: "traefik"
+    connectaware: true
+#    connectbydefault: true
+    exposedByDefault: false
+    servicename: "traefik-api" # Connect Traefik to the Consul service
+    endpoint:
+      address: "http://consul.service.consul:8500"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+#      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # LE staging 
+      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
+      storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/letsencrypt.json"
+      dnsChallenge:
+        provider: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .lego_provider }}{{- end }}"
+  home:
+    acme:
+      caServer: "https://localhost:9443/acme/home/directory" # bound via Consul Connect
+      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
+      storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
+      certificatesDuration: 720 # hours
+      tlsChallenge: true
+
+entryPoints:
+  # internal
+  web:
+    address: :80
+    proxyProtocol:
+      trustedIPs:
+        - "127.0.0.1/32"
+    http:
+      redirections: # global redirct to https
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: :443
+    proxyProtocol:
+      trustedIPs:
+        - "127.0.0.1/32"
+    http:
+      tls: 
+        options: strict_tls@file
+        certResolver: home
+
+  # external/internet
+  inet-web:
+    address: :1080
+    proxyProtocol:
+      trustedIPs:
+        - "127.0.0.1/32"
+    http: 
+      redirections: # global redirct to https
+        entrypoint:
+          to: inet-websecure
+          scheme: https
+  inet-websecure:
+    address: :1443
+    proxyProtocol:
+      trustedIPs:
+        - "127.0.0.1/32"
+    http:
+      middlewares:
+        - internet@file
+      tls:
+        options: strict_tls@file
+        certResolver: letsencrypt
+        domains:
+          - main: "schoger.net"
+            sans:
+              - "*.schoger.net"          # internet domains
+              - "*.lab.home.schoger.net" # home domains (wip)
+
+  # Traefik API
+  traefik:
+    address: :8080
+    proxyProtocol:
+      trustedIPs:
+        - "127.0.0.1/32"
+
+serversTransport:
+  insecureSkipVerify: true # trust internal TLS connection without cert validation
+  rootCAs: 
+    - {{ env "NOMAD_ALLOC_DIR" }}/data/intermediate_ca.crt
+  
+api:
+  dashboard: true
+  
+ping:
+  entryPoint: "traefik"
+
+log:
+  level: INFO
+#  level: DEBUG
+
+accessLog: 
+#  format: "<remote_IP_address> - <client_user_name_if_available> [<timestamp>] "<request_method> <request_path> <request_protocol>" <origin_server_HTTP_status> <origin_server_content_size> "<request_referrer>" "<request_user_agent>" <number_of_requests_received_since_Traefik_started> "<Traefik_router_name>" "<Traefik_server_URL>" <request_duration_in_ms>ms"
+  filePath: "/local/access.log"
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+
+global:
+  sendanonymoususage: true # Periodically send anonymous usage statistics.
+  

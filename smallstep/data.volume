@@ -1,8 +1,8 @@
 
 plugin_id   = "nfs"
 type        = "csi"
-id          = "SERVICE_NAME"
-name        = "SERVICE_NAME"
+id          = "smallstep"
+name        = "Smallstep"
 
 capability {
 	access_mode = "single-node-writer"
@@ -12,7 +12,7 @@ capability {
 context {
   server = "storage.home"
   share = "/volume2/homelab"
-  subDir = "SERVICE_NAME"
+  subDir = "smallstep"
   mountPermissions = "0"  
 }
 

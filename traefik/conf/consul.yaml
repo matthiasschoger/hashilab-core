@@ -1,0 +1,14 @@
+http:
+  routers:
+    consul:
+      rule: Host(`consul.lab.home`)   # not working yet, URL error
+      service: consul@file
+      entrypoints: websecure
+
+  services:
+    consul:
+      loadBalancer:
+        servers:
+          - url: "http://master.home:8500"
+          - url: "http://compute1.home:8500"
+          - url: "http://compute2.home:8500"

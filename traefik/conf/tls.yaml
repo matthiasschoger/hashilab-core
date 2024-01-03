@@ -1,0 +1,8 @@
+# TLS dynamic configuration
+
+tls:
+  options:
+    strict_tls:
+      minVersion: "VersionTLS13"
+      sniStrict: true
+
