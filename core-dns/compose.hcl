@@ -103,7 +103,7 @@ lab.home.:53 {
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
 
-### Local devices from the DHCP server (UDM)
+### Local devices from the DHCP server (UXG-lite)
 home. {
   bind {{ env "NOMAD_IP_dns" }}
 
