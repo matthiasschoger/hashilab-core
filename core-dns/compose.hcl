@@ -57,6 +57,10 @@ job "coredns" {
         ports = ["dns", "metrics", "health"]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       resources {
         memory = 128
         cpu    = 100

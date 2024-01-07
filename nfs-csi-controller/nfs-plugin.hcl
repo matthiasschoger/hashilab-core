@@ -27,6 +27,10 @@ job "csi-nfs-plugin" {
         privileged = true
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       csi_plugin {
         id        = "nfs"
         type      = "node"

@@ -218,6 +218,7 @@ EOH
       env {
         LEGO_CA_SYSTEM_CERT_POOL = true
         LEGO_CA_CERTIFICATES = "${NOMAD_SECRETS_DIR}/intermediate_ca.crt"
+        TZ = "Europe/Berlin"
       }
 
       template {

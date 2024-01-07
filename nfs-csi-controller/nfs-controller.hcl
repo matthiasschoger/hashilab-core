@@ -22,6 +22,10 @@ job "csi-nfs-controller" {
         ]
       }
 
+      env {
+        TZ = "Europe/Berlin"
+      }
+
       csi_plugin {
         id        = "nfs"
         type      = "controller"
