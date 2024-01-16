@@ -2,14 +2,12 @@ job "csi-nfs-plugin" {
   datacenters = ["home"]
   type = "system" # ensures that all nodes in the DC have a copy.
 
-  group "nfs" {
+  constraint {
+    attribute = "${node.class}"
+    value     = "compute"
+  }
 
-    restart {
-      interval = "30m"
-      attempts = 10
-      delay    = "15s"
-      mode     = "fail"
-    }
+  group "nfs" {
 
     task "plugin" {
       driver = "docker"
