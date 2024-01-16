@@ -17,7 +17,7 @@ job "traefik" {
     network {
       mode = "bridge"
 
-      port "api" { static = 8080 }
+      port "api" { static = 18080 }
 
       port "envoy_metrics_api" { to = 9102 }
       port "envoy_metrics_home_https" { to = 9103 }
@@ -37,7 +37,7 @@ job "traefik" {
     service {
       name = "traefik-api"
 
-      port = 8080
+      port = 18080
 
       check {
         type     = "http"

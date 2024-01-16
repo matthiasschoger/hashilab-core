@@ -69,7 +69,7 @@ entryPoints:
 
   # Traefik API
   traefik:
-    address: :8080
+    address: :18080
 
 serversTransport:
   insecureSkipVerify: true # trust internal TLS connection without cert validation
