@@ -17,7 +17,7 @@ job "traefik" {
     network {
       mode = "bridge"
 
-      port "api" { static = 18080 }
+      port "metrics" { to = 8080 } # Prometheus metrics via API port
 
       port "envoy_metrics_api" { to = 9102 }
       port "envoy_metrics_home_https" { to = 9103 }
@@ -37,7 +37,7 @@ job "traefik" {
     service {
       name = "traefik-api"
 
-      port = 18080
+      port = 8080
 
       check {
         type     = "http"
@@ -49,6 +49,7 @@ job "traefik" {
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_api}" # make envoy metrics port available in Consul
+        metrics_port = "${NOMAD_HOST_PORT_metrics}"
       }
       connect {
         sidecar_service { 
