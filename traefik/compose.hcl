@@ -130,6 +130,7 @@ job "traefik" {
       }
     }
 
+    # entrypoint for Cloudflare tunnel from cloudflared
     service {
       name = "traefik-cloudflare"
       task = "server"
@@ -158,6 +159,9 @@ job "traefik" {
       }
     }
 
+    # NOTE: If you are intrested in routing incomming traffic from your router, please have a look at earlier versions.
+    #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the projects traefik and consul-ingress
+
     # main task, Traefik
     task "server" {
 
@@ -168,26 +172,6 @@ job "traefik" {
 
         args = [ "--configFile=/local/traefik.yaml" ]
       }
-
-      template {
-        destination = "secrets/variables.env"
-        env             = true
-        data            = <<EOH
-{{- with nomadVar "nomad/jobs/traefik" }}
-{{- .lego_ddns_auth_key }} = "{{- .lego_ddns_auth_value }}"
-LEGO_PROVIDER = "{{- .lego_provider }}"
-CA_EMAIL = "{{- .ca_email }}"
-{{- end }}
-EOH
-      }
-
-/* old config
-
-lego_ddns_auth_key = DYNU_API_KEY
-lego_ddns_auth_value = cT776T5d375cdg5X533ea2b23U63ZXaZ
-lego_provider = dynu
-*/
-
 
       env {
         LEGO_CA_SYSTEM_CERT_POOL = true
