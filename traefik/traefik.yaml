@@ -14,13 +14,6 @@ providers:
       address: "http://consul.service.consul:8500"
 
 certificatesResolvers:
-  letsencrypt:
-    acme:
-#      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # LE staging 
-      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
-      storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/letsencrypt.json"
-      dnsChallenge:
-        provider: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .lego_provider }}{{- end }}"
   home:
     acme:
       caServer: "https://localhost:9443/acme/home/directory" # bound via Consul Connect
@@ -44,28 +37,8 @@ entryPoints:
       tls: 
         options: strict_tls@file
         certResolver: home
-
-  # external/internet
-  inet-web:
+  cloudflare: # from Cloudflare tunnel
     address: :1080
-    http: 
-      redirections: # global redirct to https
-        entrypoint:
-          to: inet-websecure
-          scheme: https
-  inet-websecure:
-    address: :1443
-    http:
-      middlewares:
-        - internet@file
-      tls:
-        options: strict_tls@file
-        certResolver: letsencrypt
-        domains:
-          - main: "schoger.net"
-            sans:
-              - "*.schoger.net"          # internet domains
-#              - "*.lab.home.schoger.net" # home domains (wip)
 
   # Traefik API
   traefik:

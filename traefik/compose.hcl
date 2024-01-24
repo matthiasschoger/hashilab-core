@@ -15,9 +15,8 @@ job "traefik" {
 
       port "envoy_metrics_api" { to = 9102 }
       port "envoy_metrics_home_https" { to = 9103 }
-      port "envoy_metrics_inet_https" { to = 9104 }
+      port "envoy_metrics_cloudflare" { to = 9104 }
       port "envoy_metrics_home_http" { to = 9105 }
-      port "envoy_metrics_inet_http" { to = 9106 }
     }
 
     ephemeral_disk {
@@ -76,67 +75,11 @@ job "traefik" {
     }
 
     service {
-      name = "traefik-home-https"
-      task ="server"
-
-      port = 443
-      tags = ["internal"]
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_https}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9103"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
-      }
-    }
-
-    service {
-      name = "traefik-inet-https"
-      task = "server"
-
-      port = 1443
-      tags = ["internet"]
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_inet_https}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9104"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
-      }
-    }
-
-    service {
       name = "traefik-home-http"
       task = "server"
 
       port = 80
-      tags = ["internal"]
+      tags = ["home"]
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_http}" # make envoy metrics port available in Consul
@@ -160,20 +103,48 @@ job "traefik" {
     }
 
     service {
-      name = "traefik-inet-http"
+      name = "traefik-home-https"
+      task ="server"
+
+      port = 443
+      tags = ["home"]
+
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_https}" # make envoy metrics port available in Consul
+      }
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9103"
+            }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 48
+          }
+        }
+      }
+    }
+
+    service {
+      name = "traefik-cloudflare"
       task = "server"
 
       port = 1080
       tags = ["internet"]
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_inet_http}" # make envoy metrics port available in Consul
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_cloudflare}" # make envoy metrics port available in Consul
       }
       connect {
         sidecar_service {
           proxy {
             config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9106"
+              envoy_prometheus_bind_addr = "0.0.0.0:9104"
             }
           }
         }
@@ -209,6 +180,14 @@ CA_EMAIL = "{{- .ca_email }}"
 {{- end }}
 EOH
       }
+
+/* old config
+
+lego_ddns_auth_key = DYNU_API_KEY
+lego_ddns_auth_value = cT776T5d375cdg5X533ea2b23U63ZXaZ
+lego_provider = dynu
+*/
+
 
       env {
         LEGO_CA_SYSTEM_CERT_POOL = true
