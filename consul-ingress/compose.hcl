@@ -13,8 +13,6 @@ job "consul-ingress" {
 
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
-      port  "inet-http" { static = 1080 }
-      port  "inet-https" { static = 1443 }
       port  "loki" { static = 3100 }
 
       port  "envoy_metrics" { to = 9102 }
@@ -53,22 +51,6 @@ job "consul-ingress" {
                 name = "traefik-home-https"
               }
             }          
-            listener {
-              port     = 1080
-              protocol = "tcp"
-
-              service {
-                name = "traefik-inet-http"
-              }
-            }
-            listener {
-              port     = 1443
-              protocol = "tcp"
-
-              service {
-                name = "traefik-inet-https"
-              }
-            }
             listener {
               port     = 3100
               protocol = "tcp"
