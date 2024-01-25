@@ -76,7 +76,6 @@ job "traefik" {
 
     service {
       name = "traefik-home-http"
-      task = "server"
 
       port = 80
       tags = ["home"]
@@ -104,7 +103,6 @@ job "traefik" {
 
     service {
       name = "traefik-home-https"
-      task ="server"
 
       port = 443
       tags = ["home"]
@@ -133,7 +131,6 @@ job "traefik" {
     # entrypoint for Cloudflare tunnel from cloudflared
     service {
       name = "traefik-cloudflare"
-      task = "server"
 
       port = 1080
       tags = ["internet"]
@@ -162,7 +159,6 @@ job "traefik" {
     # NOTE: If you are intrested in routing incomming traffic from your router, please have a look at earlier versions.
     #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the projects traefik and consul-ingress
 
-    # main task, Traefik
     task "server" {
 
       driver = "docker"

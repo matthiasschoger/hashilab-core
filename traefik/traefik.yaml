@@ -7,9 +7,8 @@ providers:
   consulcatalog:
     prefix: "traefik"
     connectaware: true
-#    connectbydefault: true
     exposedByDefault: false
-    servicename: "traefik-api" # Connect Traefik to the Consul service
+    servicename: "traefik-api" # connects Traefik to the Consul service
     endpoint:
       address: "http://consul.service.consul:8500"
 
@@ -21,6 +20,13 @@ certificatesResolvers:
       storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
       certificatesDuration: 720 # hours
       tlsChallenge: true
+
+tls:
+  options:
+    strict_tls:
+      minVersion: "VersionTLS13"
+      sniStrict: true
+
 
 entryPoints:
   # internal
@@ -35,9 +41,9 @@ entryPoints:
     address: :443
     http:
       tls: 
-        options: strict_tls@file
+        options: strict_tls
         certResolver: home
-  cloudflare: # from Cloudflare tunnel
+  cloudflare: # from Cloudflare tunnel, just plain HTTP since the traffic is encryped by the CF tunnel and Consul Connect
     address: :1080
 
   # Traefik API
@@ -59,9 +65,9 @@ log:
   level: INFO
 #  level: DEBUG
 
-accessLog: 
+#accessLog: 
 #  format: "<remote_IP_address> - <client_user_name_if_available> [<timestamp>] "<request_method> <request_path> <request_protocol>" <origin_server_HTTP_status> <origin_server_content_size> "<request_referrer>" "<request_user_agent>" <number_of_requests_received_since_Traefik_started> "<Traefik_router_name>" "<Traefik_server_URL>" <request_duration_in_ms>ms"
-  filePath: "/local/access.log"
+#  filePath: "/local/access.log"
 
 metrics:
   prometheus:

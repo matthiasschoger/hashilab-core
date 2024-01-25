@@ -1,7 +1,7 @@
 http:
   routers:
     consul:
-      rule: Host(`consul.lab.home`)   # not working yet, URL error
+      rule: Host(`consul.lab.home`)   # FIXME: not working yet, URL error
       service: consul@file
       entrypoints: websecure
 
