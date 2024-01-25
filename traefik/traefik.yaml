@@ -21,13 +21,6 @@ certificatesResolvers:
       certificatesDuration: 720 # hours
       tlsChallenge: true
 
-tls:
-  options:
-    strict_tls:
-      minVersion: "VersionTLS13"
-      sniStrict: true
-
-
 entryPoints:
   # internal
   web:
@@ -41,7 +34,7 @@ entryPoints:
     address: :443
     http:
       tls: 
-        options: strict_tls
+        options: strict_tls@file
         certResolver: home
   cloudflare: # from Cloudflare tunnel, just plain HTTP since the traffic is encryped by the CF tunnel and Consul Connect
     address: :1080
