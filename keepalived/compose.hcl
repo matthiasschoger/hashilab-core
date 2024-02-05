@@ -49,7 +49,7 @@ EOH
       }
 
       resources {
-        memory = 20
+        memory = 32
         cpu    = 50
       }
     }

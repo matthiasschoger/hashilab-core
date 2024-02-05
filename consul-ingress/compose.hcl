@@ -13,6 +13,7 @@ job "consul-ingress" {
 
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
+      port  "cloudflare-dyndns" { static = 1080 }
       port  "loki" { static = 3100 }
 
       port  "envoy_metrics" { to = 9102 }
@@ -34,6 +35,7 @@ job "consul-ingress" {
             # Additional options are documented at
             # https://www.nomadproject.io/docs/job-specification/gateway#ingress-parameters
 
+            # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
             # Treafik ports
             listener {
               port     = 80
@@ -51,6 +53,15 @@ job "consul-ingress" {
                 name = "traefik-home-https"
               }
             }          
+            # incoming IP update requests from the Fritz!Box router
+            listener { 
+              port     = 1080
+              protocol = "tcp"
+
+              service {
+                name = "cloudflare-dyndns"
+              }
+            }
             listener {
               port     = 3100
               protocol = "tcp"
@@ -69,6 +80,27 @@ job "consul-ingress" {
         }
 
         sidecar_task {
+/*
+          name = "connect-gateway-consul-ingress"
+          #      "connect-gateway-<service>" when used as a gateway
+
+          driver = "docker"
+
+          config {
+            image = "${meta.connect.gateway_image}"
+            #       "${meta.connect.gateway_image}" when used as a gateway
+
+            args = [
+              "-c",
+              "${NOMAD_SECRETS_DIR}/envoy_bootstrap.json",
+              "-l",
+              "debug",
+              "--concurrency",
+              "${meta.connect.proxy_concurrency}",
+              "--disable-hot-restart"
+            ]
+          }          
+*/          
           resources {
             cpu    = 100
             memory = 128
