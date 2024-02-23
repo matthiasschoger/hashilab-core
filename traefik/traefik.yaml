@@ -18,7 +18,6 @@ certificatesResolvers:
       caServer: "https://localhost:9443/acme/home/directory" # bound via Consul Connect
       email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
       storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
-      certificatesDuration: 720 # hours
       tlsChallenge: true
 
 entryPoints:

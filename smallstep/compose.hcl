@@ -69,7 +69,7 @@ job "smallstep" {
       }
 
       resources {
-        memory = 200
+        memory = 300
         cpu    = 50
       }
 
