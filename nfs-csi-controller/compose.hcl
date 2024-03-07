@@ -6,7 +6,8 @@ job "csi-nfs" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "compute"
+      operator  = "set_contains_any" # deploy on compute and DMZ nodes
+      value     = "compute,dmz"
     }
 
     task "plugin" {
