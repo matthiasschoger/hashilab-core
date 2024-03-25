@@ -103,7 +103,7 @@ job "consul-ingress" {
 */          
           resources {
             cpu    = 100
-            memory = 128
+            memory = 64
           }
         }
       }
