@@ -35,6 +35,7 @@ entryPoints:
       tls: 
         options: strict_tls@file
         certResolver: home
+
   cloudflare: # from Cloudflare tunnel, just plain HTTP since the traffic is encryped by the CF tunnel and Consul Connect
     address: :1080
 
