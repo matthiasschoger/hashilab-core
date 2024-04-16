@@ -19,6 +19,7 @@ http:
 
     proxmox0:
       loadBalancer:
+        passHostHeader: true
         healthCheck:
           path: /api2/json/access/ticket
           interval: 5s
@@ -28,6 +29,7 @@ http:
 
     proxmox1:
       loadBalancer:
+        passHostHeader: true
         healthCheck:
           path: /api2/json/access/ticket
           interval: 5s
@@ -37,6 +39,7 @@ http:
 
     proxmox2:
       loadBalancer:
+        passHostHeader: true
         healthCheck:
           path: /api2/json/access/ticket
           interval: 5s
