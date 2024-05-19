@@ -2,7 +2,8 @@ job "traefik" {
   datacenters = ["home"]
   type        = "service"
 
-  group "traefik" {
+  # Traefik instance for the home (internal) network
+  group "traefik-home" {
     constraint {
       attribute = "${node.class}"
       value     = "compute"
@@ -28,7 +29,7 @@ job "traefik" {
     }
 
     service {
-      name = "traefik-api"
+      name = "traefik-home-api"
 
       port = 8080
 
@@ -199,6 +200,150 @@ EOH
 
       resources {
         memory = 256
+        cpu    = 400
+      }
+    }
+  }
+
+
+  # Traefik instance for the DMZ, routes traffic from cloudflared to the desired services
+  group "traefik-dmz" {
+    constraint {
+      attribute = "${node.class}"
+      value     = "dmz"
+    }
+
+    network {
+      mode = "bridge"
+
+      port "metrics" { to = 8080 } # Prometheus metrics via API port
+
+      port "envoy_metrics_api" { to = 9102 }
+      port "envoy_metrics_home_http" { to = 9103 }
+    }
+
+    service {
+      name = "traefik-dmz-api"
+
+      port = 8080
+
+      check {
+        type     = "http"
+        path     = "/ping"
+        interval = "5s"
+        timeout  = "2s"
+        expose   = true # required for Connect
+      }
+
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_api}" # make envoy metrics port available in Consul
+        metrics_port = "${NOMAD_HOST_PORT_metrics}"
+      }
+      connect {
+        sidecar_service { 
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9102"
+            }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 48
+          }
+        }
+      }
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.home`)",
+        "traefik.http.routers.traefik-dmz.entrypoints=websecure"
+      ]
+    }
+
+    service {
+      name = "traefik-dmz-http"
+
+      port = 80
+      tags = ["dmz"]
+
+      meta {
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_http}" # make envoy metrics port available in Consul
+      }
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9103"
+            }
+          }
+        }
+
+        sidecar_task {
+          resources {
+            cpu    = 50
+            memory = 48
+          }
+        }
+      }
+    }
+
+    task "server" {
+
+      driver = "docker"
+
+      config {
+        image = "traefik:latest"
+
+        args = [ "--configFile=/local/traefik.yaml" ]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "local/traefik.yaml"
+        data = <<EOH
+providers:
+  consulcatalog:
+    prefix: "dmz"
+    connectaware: true
+    exposedByDefault: false
+    servicename: "traefik-dmz-api" # connects Traefik to the Consul service
+    endpoint:
+      address: "http://consul.service.consul:8500"
+
+entryPoints:
+  cloudflare:
+    address: :80
+  traefik:
+    address: :8080
+
+api:
+  dashboard: true
+  insecure: true
+
+ping:
+  entryPoint: "traefik"
+
+log:
+  level: INFO
+#  level: DEBUG
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+EOH
+      }
+
+      resources {
+        memory = 192
         cpu    = 400
       }
     }

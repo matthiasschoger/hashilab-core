@@ -8,7 +8,7 @@ providers:
     prefix: "traefik"
     connectaware: true
     exposedByDefault: false
-    servicename: "traefik-api" # connects Traefik to the Consul service
+    servicename: "traefik-home-api" # connects Traefik to the Consul service
     endpoint:
       address: "http://consul.service.consul:8500"
 
@@ -57,10 +57,6 @@ ping:
 log:
   level: INFO
 #  level: DEBUG
-
-#accessLog: 
-#  format: "<remote_IP_address> - <client_user_name_if_available> [<timestamp>] "<request_method> <request_path> <request_protocol>" <origin_server_HTTP_status> <origin_server_content_size> "<request_referrer>" "<request_user_agent>" <number_of_requests_received_since_Traefik_started> "<Traefik_router_name>" "<Traefik_server_URL>" <request_duration_in_ms>ms"
-#  filePath: "/local/access.log"
 
 metrics:
   prometheus:
