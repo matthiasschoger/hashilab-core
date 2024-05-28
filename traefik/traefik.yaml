@@ -6,6 +6,7 @@ providers:
     watch: false
   consulcatalog:
     prefix: "traefik"
+    watch: true # use watch instead of polling
     connectaware: true
     exposedByDefault: false
     servicename: "traefik-home-api" # connects Traefik to the Consul service
@@ -18,7 +19,7 @@ certificatesResolvers:
       caServer: "https://localhost:9443/acme/home/directory" # bound via Consul Connect
       email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
       storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
-      tlsChallenge: true
+      tlsChallenge: {}
 
 entryPoints:
   # internal
@@ -35,10 +36,6 @@ entryPoints:
       tls: 
         options: strict_tls@file
         certResolver: home
-
-  cloudflare: # from Cloudflare tunnel, just plain HTTP since the traffic is encryped by the CF tunnel and Consul Connect
-    address: :1080
-
   # Traefik API
   traefik:
     address: :8080

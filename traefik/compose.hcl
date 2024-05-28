@@ -129,37 +129,8 @@ job "traefik" {
       }
     }
 
-    # entrypoint for Cloudflare tunnel from cloudflared
-    service {
-      name = "traefik-cloudflare"
-
-      port = 1080
-      tags = ["internet"]
-
-      meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_cloudflare}" # make envoy metrics port available in Consul
-      }
-      connect {
-        sidecar_service {
-          proxy {
-            config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9104"
-            }
-          }
-        }
-
-        sidecar_task {
-          resources {
-            cpu    = 50
-            memory = 48
-          }
-        }
-      }
-    }
-
     # NOTE: If you are intrested in routing incomming traffic from your router, please have a look at earlier versions.
     #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the projects traefik and consul-ingress
-
     task "server" {
 
       driver = "docker"
@@ -219,7 +190,7 @@ EOH
       port "metrics" { to = 8080 } # Prometheus metrics via API port
 
       port "envoy_metrics_api" { to = 9102 }
-      port "envoy_metrics_home_http" { to = 9103 }
+      port "envoy_metrics_dmz_http" { to = 9103 }
     }
 
     service {
@@ -264,6 +235,7 @@ EOH
       ]
     }
 
+    # Cloudflare entrypoint, is bound to localhost:80 in the cloudflared job via Consul Connect
     service {
       name = "traefik-dmz-http"
 
@@ -271,7 +243,7 @@ EOH
       tags = ["dmz"]
 
       meta {
-        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_http}" # make envoy metrics port available in Consul
+        envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_dmz_http}" # make envoy metrics port available in Consul
       }
       connect {
         sidecar_service {
@@ -339,6 +311,9 @@ metrics:
     addEntryPointsLabels: true
     addRoutersLabels: true
     addServicesLabels: true
+
+global:
+  sendanonymoususage: true # Periodically send anonymous usage statistics.
 EOH
       }
 
