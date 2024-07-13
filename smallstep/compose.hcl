@@ -20,16 +20,16 @@ job "smallstep" {
 
       port = 9443
 
-      // WTF??? health check causes Envoy bootstrap error!
-      // check {
-      //   type     = "http"
-      //   protocol = "https"
-      //   tls_skip_verify = true
-      //   path     = "/health"
-      //   interval = "5s"
-      //   timeout  = "2s"
-      //   expose   = true # required for Connect
-      // }
+      # WTF??? health check causes Envoy bootstrap error!
+//       check {
+//         type     = "http"
+// #        protocol = "https"
+// #        tls_skip_verify = true
+//         path     = "/health"
+//         interval = "5s"
+//         timeout  = "2s"
+//         expose   = true # required for Connect
+//       }
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
@@ -57,11 +57,6 @@ job "smallstep" {
 
       config {
         image = "smallstep/step-ca:latest"
-
-        volumes = [
-          # use TLS certs from host OS, including the homelab cert
-#          "/etc/ssl/certs/schoger_home_intermediate.pem:/etc/ssl/certs/schoger_home_intermediate.pem:ro",
-        ]      
       }
 
       env {

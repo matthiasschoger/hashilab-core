@@ -278,6 +278,21 @@ EOH
       }
 
       template {
+        destination = "${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.crt"
+        perms = "600"
+        data = <<EOH
+{{- with nomadVar "nomad/jobs/traefik" }}{{- .origin_certificate }}{{- end }}
+EOH
+      }
+      template {
+        destination = "${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.key"
+        perms = "600"
+        data = <<EOH
+{{- with nomadVar "nomad/jobs/traefik" }}{{- .origin_private_key }}{{- end }}
+EOH
+      }
+
+      template {
         destination = "local/traefik.yaml"
         data = <<EOH
 providers:
@@ -292,8 +307,19 @@ providers:
 entryPoints:
   cloudflare:
     address: :80
+  websecure:
+    address: :443
+    http:
+      tls: 
+        options: strict_tls@file
+        certResolver: home
   traefik:
     address: :8080
+
+tls:
+  certificates:
+    - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.crt
+      keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.key
 
 api:
   dashboard: true
