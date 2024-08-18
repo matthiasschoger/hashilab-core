@@ -1,5 +1,5 @@
 job "traefik" {
-  datacenters = ["home"]
+  datacenters = ["home", "dmz"]
   type        = "service"
 
   # Traefik instance for the home (internal) network

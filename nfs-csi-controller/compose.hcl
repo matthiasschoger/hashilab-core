@@ -1,14 +1,8 @@
 job "csi-nfs" {
-  datacenters = ["home"]
+  datacenters = ["home", "dmz"]
   type = "system" # ensures that all nodes in the DC have a copy.
 
   group "plugin" {
-
-    constraint {
-      attribute = "${node.class}"
-      operator  = "set_contains_any" # deploy on compute and DMZ nodes
-      value     = "compute,dmz"
-    }
 
     task "plugin" {
       driver = "docker"
