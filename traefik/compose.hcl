@@ -179,8 +179,9 @@ EOH
 
   # Traefik instance for the DMZ, routes traffic from cloudflared to the desired services
   group "traefik-dmz" {
+
     constraint {
-      attribute = "${node.class}"
+      attribute = "${node.datacenter}"
       value     = "dmz"
     }
 
