@@ -11,6 +11,7 @@ job "consul-ingress" {
     network {
       mode = "bridge"
 
+      # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
       port  "smtp" { static = 25 }
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
@@ -37,7 +38,6 @@ job "consul-ingress" {
             # https://www.nomadproject.io/docs/job-specification/gateway#ingress-parameters
 
             # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
-            # Treafik ports
             listener {
               port     = 25
               protocol = "tcp"
@@ -46,6 +46,7 @@ job "consul-ingress" {
                 name = "protonmail-smtp"
               }
             }
+            # Treafik ports
             listener {
               port     = 80
               protocol = "tcp"
@@ -71,6 +72,7 @@ job "consul-ingress" {
                 name = "cloudflare-dyndns"
               }
             }
+            # Loki ingress, simplifies logging from the DMZ
             listener {
               port     = 3100
               protocol = "tcp"
