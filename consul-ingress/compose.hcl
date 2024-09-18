@@ -13,7 +13,6 @@ job "consul-ingress" {
 
       # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
       port  "smtp" { static = 25 }
-      port  "imap" { static = 143 }
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
       port  "cloudflare-dyndns" { static = 1080 }
@@ -47,14 +46,6 @@ job "consul-ingress" {
 
               service {
                 name = "protonmail-smtp"
-              }
-            }
-            listener {
-              port     = 143
-              protocol = "tcp"
-
-              service {
-                name = "protonmail-imap"
               }
             }
             # Treafik ports
