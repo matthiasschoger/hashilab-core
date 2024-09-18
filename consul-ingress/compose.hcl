@@ -25,6 +25,8 @@ job "consul-ingress" {
     service {
       name = "ingress-gateway"
 
+      tags = [ "diun.enable=false" ] # don't check with diun
+
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
       }

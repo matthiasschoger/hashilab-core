@@ -18,6 +18,8 @@ job "consul-gateway-home" {
     service {
       name = "mesh-gateway"
 
+      tags = [ "diun.enable=false" ] # don't check with diun
+
       # The mesh gateway connect service should be configured to use a port from
       # the host_network capable of cross-datacenter connections.
       port = "mesh"
