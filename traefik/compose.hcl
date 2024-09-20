@@ -129,7 +129,24 @@ job "traefik" {
       }
     }
 
-    # NOTE: If you are intrested in routing incomming traffic from your router, please have a look at earlier versions.
+    # wait for step CA to be healthy before starting Traefik. Otherwise, cert creation might fail and Trarfik is too stupid to retry.
+    task "wait-for-smallstep" {
+
+      driver = "docker"
+
+      config {
+        image        = "busybox:1.28"
+        command      = "sh"
+        args         = ["-c", "echo -n 'Waiting for service'; until nslookup smallstep.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+      }
+
+      lifecycle {
+        hook = "prestart"
+        sidecar = false
+      }
+    }
+
+    # NOTE: If you are interested in routing incomming traffic from your router via port forwarding, please have a look at earlier versions.
     #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the projects traefik and consul-ingress
     task "server" {
 
@@ -228,7 +245,7 @@ EOH
         }
       }
 
-      tags = [
+      tags = [ # registers the DMZ Traefik instance with the home instance
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.home`)",
