@@ -72,7 +72,7 @@ job "coredns" {
         change_mode   = "signal"
         change_signal = "SIGUSR1"
         data = <<EOH
-# resolve immich.schoger.net to the local Traefik
+### resolve immich.schoger.net to the local Traefik
 immich.schoger.net.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
