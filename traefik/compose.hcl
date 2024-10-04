@@ -5,6 +5,10 @@ job "traefik" {
   # Traefik instance for the home (internal) network
   group "traefik-home" {
     constraint {
+      attribute = "${node.datacenter}"
+      value     = "home"
+    }
+    constraint {
       attribute = "${node.class}"
       value     = "compute"
     }
