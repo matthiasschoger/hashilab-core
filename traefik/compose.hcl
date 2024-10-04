@@ -325,12 +325,6 @@ providers:
 entryPoints:
   cloudflare:
     address: :80
-  websecure:
-    address: :443
-    http:
-      tls: 
-        options: strict_tls@file
-        certResolver: home
   traefik:
     address: :8080
 
