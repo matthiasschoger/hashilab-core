@@ -4,43 +4,15 @@ job "coredns" {
 
   group "coredns" {
 
-    # distribute across the two compute nodes
-#    count = 2
     constraint {
       attribute = "${node.class}"
       value     = "compute"
     }
-#    constraint {
-#      distinct_hosts = true
-#    }
 
     network {
       port "dns" { static = "53"  }
       port "metrics" { static = "9153" }
       port "health" { }
-    }
-
-/* unfortunately, update max_parallel is not supported for "system" jobs
-    update { # make sure that the second node gets updated only after the first deployment was successful
-      max_parallel  = 1 
-      auto_revert   = true
-      health_check  = "checks"
-      stagger       = "5s"
-    }
-*/
-
-    service {
-      name = "coredns"
-
-      port = "dns"
-
-      check {
-        type     = "http"
-        path     = "/health"
-        port     = "health"
-        interval = "5s"
-        timeout  = "5s"
-      }
     }
 
    task "server" {
@@ -81,7 +53,7 @@ immich.schoger.net.:53 {
 
   hosts {
     192.168.0.3  immich.schoger.net
- }
+  }
   header { 
     response set ra # set RecursionAvailable flag
   }
@@ -94,25 +66,9 @@ immich.schoger.net.:53 {
 fritz.box.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
-  # global health check
-  health :{{ env "NOMAD_PORT_health" }}
-
   hosts {
     172.16.1.1  fritz.box
   }
-  header { 
-    response set ra # set RecursionAvailable flag
-  }
-
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
-}
-
-### *.lab.home Traefik reverse proxy
-lab.home.:53 {
-  bind {{ env "NOMAD_IP_dns" }}
-
-  file /local/coredns/zones/db.home.lab lab.home
   header { 
     response set ra # set RecursionAvailable flag
   }
