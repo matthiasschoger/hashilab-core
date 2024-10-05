@@ -143,9 +143,6 @@ job "traefik" {
 
       env {
         TZ = "Europe/Berlin"
-
-        LEGO_CA_SYSTEM_CERT_POOL = true
-        LEGO_CA_CERTIFICATES = "${NOMAD_SECRETS_DIR}/intermediate_ca.crt"
       }
 
       template {
@@ -162,14 +159,6 @@ EOH
       template {
         destination = "local/traefik.yaml"
         data        = file("traefik.yaml")
-      }
-
-      template {
-        destination = "${NOMAD_SECRETS_DIR}/intermediate_ca.crt"
-        perms = "600"
-        data = <<EOH
-{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_certificate }}{{- end }}
-EOH
       }
 
       dynamic "template" {

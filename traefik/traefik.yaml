@@ -47,8 +47,6 @@ entryPoints:
 
 serversTransport:
   insecureSkipVerify: true # trust internal TLS connection without cert validation
-  rootCAs: 
-    - {{ env "NOMAD_ALLOC_DIR" }}/data/intermediate_ca.crt
   
 api:
   dashboard: true

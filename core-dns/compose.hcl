@@ -73,22 +73,22 @@ job "coredns" {
         change_signal = "SIGUSR1"
         data = <<EOH
 ### resolve immich.schoger.net to the local Traefik
-#immich.schoger.net.:53 {
-#  bind {{ env "NOMAD_IP_dns" }}
+immich.schoger.net.:53 {
+  bind {{ env "NOMAD_IP_dns" }}
 
   # global health check
-#  health :{{ env "NOMAD_PORT_health" }}
+  health :{{ env "NOMAD_PORT_health" }}
 
-#  hosts {
-#    192.168.0.3  immich.schoger.net
-# }
-#  header { 
-#    response set ra # set RecursionAvailable flag
-#  }
+  hosts {
+    192.168.0.3  immich.schoger.net
+ }
+  header { 
+    response set ra # set RecursionAvailable flag
+  }
 
-#  errors
-#  prometheus {{ env "NOMAD_ADDR_metrics" }}
-#}
+  errors
+  prometheus {{ env "NOMAD_ADDR_metrics" }}
+}
 
 ### fritz.box to resolve the network printer
 fritz.box.:53 {
