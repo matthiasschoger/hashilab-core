@@ -73,7 +73,9 @@ job "traefik" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik.rule=Host(`lab.home`) || Host(`traefik.lab.home`)",
+#        "traefik.http.routers.traefik.rule=Host(`lab.home`) || Host(`traefik.lab.home`)",
+        "traefik.http.routers.traefik.rule=Host(`lab.schoger.net`) || Host(`traefik.lab.schoger.net`)",
+        "traefik.http.routers.traefik.tls.certresolver=le",
         "traefik.http.routers.traefik.service=api@internal",
         "traefik.http.routers.traefik.entrypoints=websecure"
       ]
@@ -83,8 +85,8 @@ job "traefik" {
       name = "traefik-home-http"
 
       port = 80
-      tags = ["home"]
 
+      tags = ["home"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_http}" # make envoy metrics port available in Consul
       }
@@ -151,7 +153,7 @@ job "traefik" {
     }
 
     # NOTE: If you are interested in routing incomming traffic from your router via port forwarding, please have a look at earlier versions.
-    #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the projects traefik and consul-ingress
+    #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the jobs traefik and consul-ingress
     task "server" {
 
       driver = "docker"
@@ -163,9 +165,21 @@ job "traefik" {
       }
 
       env {
+        TZ = "Europe/Berlin"
+
         LEGO_CA_SYSTEM_CERT_POOL = true
         LEGO_CA_CERTIFICATES = "${NOMAD_SECRETS_DIR}/intermediate_ca.crt"
-        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "secrets/variables.env"
+        env         = true
+        perms       = 400
+        data        = <<EOH
+{{- with nomadVar "nomad/jobs/traefik" }}
+CF_DNS_API_TOKEN = "{{- .cf_dns_api_token }}"
+{{- end }}
+EOH
       }
 
       template {
@@ -262,8 +276,8 @@ EOH
       name = "traefik-dmz-http"
 
       port = 80
-      tags = ["dmz"]
 
+      tags = ["dmz"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_dmz_http}" # make envoy metrics port available in Consul
       }
@@ -360,7 +374,7 @@ EOH
       }
 
       resources {
-        memory = 192
+        memory = 128
         cpu    = 400
       }
     }

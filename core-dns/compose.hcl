@@ -121,6 +121,19 @@ lab.home.:53 {
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
 
+### *.lab.schoger.net Traefik reverse proxy
+lab.schoger.net.:53 {
+  bind {{ env "NOMAD_IP_dns" }}
+
+  file /local/coredns/zones/db.net.schoger.lab lab.schoger.net
+  header { 
+    response set ra # set RecursionAvailable flag
+  }
+
+  errors
+  prometheus {{ env "NOMAD_ADDR_metrics" }}
+}
+
 ### Local devices from the DHCP server (UXG-lite)
 home. {
   bind {{ env "NOMAD_IP_dns" }}
@@ -194,6 +207,36 @@ ns2               IN A   192.168.0.31
 ; services - A records
 lab.home.         IN A   192.168.0.3
 *                 IN A   192.168.0.3
+
+EOH
+      }
+
+      template {
+        change_mode   = "signal"
+        change_signal = "SIGUSR1"
+        destination = "local/coredns/zones/db.net.schoger.lab"
+        data = <<EOH
+$ORIGIN lab.schoger.net.
+$TTL    604800
+lab.schoger.net.  IN SOA	ns1.lab.schoger.net. admin.lab.schoger.net. (
+                  1        ; Serial, TODO: use timestamp
+             604800        ; Refresh
+              86400        ; Retry
+            2419200        ; Expire
+             604800 )      ; Negative Cache TTL
+
+; name servers - NS records
+lab.schoger.net.         IN NS	 ns1.lab.schoger.net.
+lab.schoger.net.         IN NS	 ns2.lab.schoger.net.
+
+; name servers - A records
+ns1               IN A   192.168.0.30
+ns2               IN A   192.168.0.31
+
+{{- /*  Point domains to the Traefik reverse proxy listening to the floating IP from keepalived */}}
+; services - A records
+lab.schoger.net.         IN A   192.168.0.3
+*                        IN A   192.168.0.3
 
 EOH
       }

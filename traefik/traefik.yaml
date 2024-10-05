@@ -20,6 +20,17 @@ certificatesResolvers:
       email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
       storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
       tlsChallenge: {}
+  le:
+    acme:
+      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
+      storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/le.json"
+      caServer: https://acme-v02.api.letsencrypt.org/directory # prod (default)
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging
+      dnschallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
 
 entryPoints:
   # internal
