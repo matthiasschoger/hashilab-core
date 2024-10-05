@@ -14,12 +14,6 @@ providers:
       address: "http://consul.service.consul:8500"
 
 certificatesResolvers:
-  home:
-    acme:
-      caServer: "https://localhost:9443/acme/home/directory" # bound via Consul Connect
-      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
-      storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/home.json"
-      tlsChallenge: {}
   le:
     acme:
       email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"

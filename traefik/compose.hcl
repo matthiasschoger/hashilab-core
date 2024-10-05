@@ -55,10 +55,6 @@ job "traefik" {
             config {
               envoy_prometheus_bind_addr = "0.0.0.0:9102"
             }
-            upstreams {
-              destination_name = "smallstep"
-              local_bind_port  = 9443
-            }
           }
         }
 
@@ -133,25 +129,8 @@ job "traefik" {
       }
     }
 
-    # wait for step CA to be healthy before starting Traefik. Otherwise, cert creation might fail and Trarfik is too stupid to retry.
-    task "wait-for-smallstep" {
-
-      driver = "docker"
-
-      config {
-        image        = "busybox:1.28"
-        command      = "sh"
-        args         = ["-c", "echo -n 'Waiting for service'; until nslookup smallstep.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
-      }
-
-      lifecycle {
-        hook = "prestart"
-        sidecar = false
-      }
-    }
-
     # NOTE: If you are interested in routing incomming traffic from your router via port forwarding, please have a look at earlier versions.
-    #  I have changed the setup to Cloudflare tunnels, but you can find the original setup in the jobs traefik and consul-ingress
+    #  In the meanwhile I have changed the setup to Cloudflare tunnels, but you can find the original setup in the jobs traefik and consul-ingress
     task "server" {
 
       driver = "docker"
