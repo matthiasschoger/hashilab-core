@@ -73,9 +73,7 @@ job "traefik" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-#        "traefik.http.routers.traefik.rule=Host(`lab.home`) || Host(`traefik.lab.home`)",
         "traefik.http.routers.traefik.rule=Host(`lab.schoger.net`) || Host(`traefik.lab.schoger.net`)",
-        "traefik.http.routers.traefik.tls.certresolver=le",
         "traefik.http.routers.traefik.service=api@internal",
         "traefik.http.routers.traefik.entrypoints=websecure"
       ]
@@ -266,7 +264,7 @@ EOH
       tags = [ # registers the DMZ Traefik instance with the home instance
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.home`)",
+        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.schoger.net`)",
         "traefik.http.routers.traefik-dmz.entrypoints=websecure"
       ]
     }

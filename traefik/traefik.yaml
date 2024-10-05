@@ -46,7 +46,7 @@ entryPoints:
     http:
       tls: 
         options: strict_tls@file
-        certResolver: home
+        certResolver: le
   # Traefik API
   traefik:
     address: :8080
