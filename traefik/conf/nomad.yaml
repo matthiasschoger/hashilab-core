@@ -1,7 +1,7 @@
 http:
   routers:
     nomad:
-      rule: Host(`nomad.lab.home`)
+      rule: Host(`nomad.lab.schoger.net`)
       service: nomad@file
       entrypoints: websecure
 
