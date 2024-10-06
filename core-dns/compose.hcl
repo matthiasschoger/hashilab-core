@@ -38,30 +38,12 @@ job "coredns" {
         cpu    = 100
       }
 
-      #templates (corefile + lab.home zone file)
+      #templates (corefile + lab.schoger.net zone file)
       template {
         destination = "local/coredns/corefile"
         change_mode   = "signal"
         change_signal = "SIGUSR1"
         data = <<EOH
-### resolve immich.schoger.net to the local Traefik
-immich.schoger.net.:53 {
-  bind {{ env "NOMAD_IP_dns" }}
-
-  # global health check
-  health :{{ env "NOMAD_PORT_health" }}
-
-  hosts {
-    192.168.0.3  immich.schoger.net
-  }
-  header { 
-    response set ra # set RecursionAvailable flag
-  }
-
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
-}
-
 ### fritz.box to resolve the network printer
 fritz.box.:53 {
   bind {{ env "NOMAD_IP_dns" }}
@@ -133,36 +115,6 @@ consul. {
   errors
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
-
-EOH
-      }
-
-      template {
-        change_mode   = "signal"
-        change_signal = "SIGUSR1"
-        destination = "local/coredns/zones/db.home.lab"
-        data = <<EOH
-$ORIGIN lab.home.
-$TTL    604800
-lab.home.         IN SOA	ns1.lab.home. admin.lab.home. (
-                  1        ; Serial, TODO: use timestamp
-             604800        ; Refresh
-              86400        ; Retry
-            2419200        ; Expire
-             604800 )      ; Negative Cache TTL
-
-; name servers - NS records
-lab.home.         IN NS	 ns1.lab.home.
-lab.home.         IN NS	 ns2.lab.home.
-
-; name servers - A records
-ns1               IN A   192.168.0.30
-ns2               IN A   192.168.0.31
-
-{{- /*  Point domains to the Traefik reverse proxy listening to the floating IP from keepalived */}}
-; services - A records
-lab.home.         IN A   192.168.0.3
-*                 IN A   192.168.0.3
 
 EOH
       }
