@@ -2,7 +2,7 @@ job "consul-ingress" {
   datacenters = ["home"]
   type        = "system"
 
-  group "ingress" {
+  group "ingress-tcp" {
     constraint {
       attribute = "${node.class}"
       value     = "compute"
@@ -17,6 +17,7 @@ job "consul-ingress" {
       port  "home-https" { static = 443 }
       port  "cloudflare-dyndns" { static = 1080 }
       port  "loki" { static = 3100 }
+      port  "unifi-inform" { static = 8080 }
 
       port  "envoy_metrics" { to = 9102 }
     }
@@ -40,6 +41,8 @@ job "consul-ingress" {
             # https://www.nomadproject.io/docs/job-specification/gateway#ingress-parameters
 
             # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
+
+            # Protonmail bridge
             listener {
               port     = 25
               protocol = "tcp"
@@ -83,6 +86,15 @@ job "consul-ingress" {
                 name = "loki"
               }
             }
+            # Unifi Network inform ingress, required for adopting Unifi devices on the network
+            listener {
+              port     = 8080
+              protocol = "tcp"
+
+              service {
+                name = "unifi-network-inform"
+              }
+            }
           }
 
           proxy {
@@ -119,6 +131,77 @@ job "consul-ingress" {
             memory = 64
           }
         }
+      }
+    }
+  }
+
+  group "ingress-udp" {
+    constraint {
+      attribute = "${node.class}"
+      value     = "compute"
+    }
+
+    network {
+      mode = "host"
+
+      port "stun"      { static = 3478 }
+      port "discovery" { static = 10001 }
+    }
+
+    task "nginx" {
+
+      driver = "docker"
+
+      config {
+        image = "nginx:latest"
+
+        volumes = [ "local/conf.d/stream.conf:/etc/nginx/stream.conf" ]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+      }
+
+      template {
+        destination = "local/conf.d/stream.conf"
+        change_mode   = "signal"
+        change_signal = "SIGHUP"
+
+        data = <<EOH
+stream {
+
+    upstream unifi-network-stun {
+  {{- range service "unifi-network-stun" }}{{- /* iterates over the instances of the unifi-network-stun service  */}}
+        server {{ print .Address ":" .Port }};
+  {{- end}} 
+    }
+
+    upstream unifi-network-discovery {
+  {{- range service "unifi-network-discovery" }}{{- /* iterates over the instances of the unifi-network-discovery service  */}}
+        server {{ print .Address ":" .Port }};
+  {{- end}} 
+    }
+
+    server {
+        listen 3478 udp;
+        proxy_pass unifi-network-stun;
+
+        proxy_responses 1;
+    }
+
+    server {
+        listen 10001 udp;
+        proxy_pass unifi-network-discovery;
+
+        proxy_responses 1;
+    }
+}
+EOH
+      }
+
+      resources {
+        memory = 50
+        cpu    = 50
       }
     }
   }
