@@ -17,6 +17,8 @@ job "consul-ingress" {
       port  "home-https" { static = 443 }
       port  "cloudflare-dyndns" { static = 1080 }
       port  "loki" { static = 3100 }
+      
+      port  "unifi-speedtest" { static = 6789 }
       port  "unifi-inform" { static = 8080 }
 
       port  "envoy_metrics" { to = 9102 }
@@ -86,6 +88,15 @@ job "consul-ingress" {
                 name = "loki"
               }
             }
+            # Unifi Network speedtest ingress
+            listener {
+              port     = 6789
+              protocol = "tcp"
+
+              service {
+                name = "unifi-network-speedtest"
+              }
+            }
             # Unifi Network inform ingress, required for adopting Unifi devices on the network
             listener {
               port     = 8080
@@ -135,6 +146,7 @@ job "consul-ingress" {
     }
   }
 
+  # Ingress proxy for UDP traffic
   group "ingress-udp" {
     constraint {
       attribute = "${node.class}"
@@ -144,8 +156,9 @@ job "consul-ingress" {
     network {
       mode = "host"
 
-      port "stun"      { static = 3478 }
-      port "discovery" { static = 10001 }
+      port "stun"         { static = 3478 }  # UDP
+      port "discovery"    { static = 10001 } # UDP
+      port "discovery-l2" { static = 1900 }  # UDP
     }
 
     task "nginx" {
@@ -182,6 +195,12 @@ stream {
   {{- end}} 
     }
 
+    upstream unifi-network-discovery-l2 {
+  {{- range service "unifi-network-discovery-l2" }}{{- /* iterates over the instances of the unifi-network-discovery-l2 service  */}}
+        server {{ print .Address ":" .Port }};
+  {{- end}} 
+    }
+
     server {
         listen 3478 udp;
         proxy_pass unifi-network-stun;
@@ -192,6 +211,13 @@ stream {
     server {
         listen 10001 udp;
         proxy_pass unifi-network-discovery;
+
+        proxy_responses 1;
+    }
+
+    server {
+        listen 1900 udp;
+        proxy_pass unifi-network-discovery-l2;
 
         proxy_responses 1;
     }
