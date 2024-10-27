@@ -183,22 +183,12 @@ job "consul-ingress" {
         data = <<EOH
 stream {
 
+{{- $unifi_network_stun := service "unifi-network-stun" }}
+{{- if $unifi_network_stun }}
     upstream unifi-network-stun {
-  {{- range service "unifi-network-stun" }}{{- /* iterates over the instances of the unifi-network-stun service  */}}
+  {{- range $unifi_network_stun }}
         server {{ print .Address ":" .Port }};
-  {{- end}} 
-    }
-
-    upstream unifi-network-discovery {
-  {{- range service "unifi-network-discovery" }}{{- /* iterates over the instances of the unifi-network-discovery service  */}}
-        server {{ print .Address ":" .Port }};
-  {{- end}} 
-    }
-
-    upstream unifi-network-discovery-l2 {
-  {{- range service "unifi-network-discovery-l2" }}{{- /* iterates over the instances of the unifi-network-discovery-l2 service  */}}
-        server {{ print .Address ":" .Port }};
-  {{- end}} 
+  {{- end }} 
     }
 
     server {
@@ -207,12 +197,30 @@ stream {
 
         proxy_responses 1;
     }
+{{- end }} 
+
+{{ $unifi_network_discovery := service "unifi-network-discovery" }}
+{{- if $unifi_network_discovery }}
+    upstream unifi-network-discovery {
+  {{- range $unifi_network_discovery }}
+        server {{ print .Address ":" .Port }};
+  {{- end }} 
+    }
 
     server {
         listen 10001 udp;
         proxy_pass unifi-network-discovery;
 
         proxy_responses 1;
+    }
+{{- end }} 
+
+{{ $unifi_network_discovery_l2 := service "unifi-network-discovery-l2" }}
+{{- if $unifi_network_discovery_l2 }}
+    upstream unifi-network-discovery-l2 {
+  {{- range $unifi_network_discovery_l2 }}
+        server {{ print .Address ":" .Port }};
+  {{- end }} 
     }
 
     server {
@@ -221,6 +229,7 @@ stream {
 
         proxy_responses 1;
     }
+{{- end }} 
 }
 EOH
       }
