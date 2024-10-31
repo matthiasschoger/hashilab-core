@@ -106,6 +106,15 @@ job "consul-ingress" {
                 name = "unifi-network-inform"
               }
             }
+            # Homeassistant Homekit port
+            listener {
+              port     = 21063
+              protocol = "tcp"
+
+              service {
+                name = "homeassistant-homekit"
+              }
+            }
           }
 
           proxy {
@@ -166,7 +175,7 @@ job "consul-ingress" {
       driver = "docker"
 
       config {
-        image = "nginx:latest"
+        image = "nginxinc/nginx-unprivileged:alpine"
 
         volumes = [ "local/conf.d/stream.conf:/etc/nginx/stream.conf" ]
       }
@@ -230,13 +239,45 @@ stream {
         proxy_responses 1;
     }
 {{- end }} 
+
+{{ $homeassistant_shelly := service "homeassistant-shelly" }}
+{{- if $homeassistant_shelly }}
+    upstream homeassistant-shelly {
+  {{- range $homeassistant_shelly }}
+        server {{ print .Address ":" .Port }};
+  {{- end }} 
+    }
+
+    server {
+        listen 5683 udp;
+        proxy_pass homeassistant-shelly;
+
+        proxy_responses 1;
+    }
+{{- end }} 
+
+{{ $homeassistant_mDNS_listener := service "homeassistant-mDNS-listener" }}
+{{- if $homeassistant_mDNS_listener }}
+    upstream homeassistant-mDNS-listener {
+  {{- range $homeassistant_mDNS_listener }}
+        server {{ print .Address ":" .Port }};
+  {{- end }} 
+    }
+
+    server {
+        listen 5353 udp;
+        proxy_pass homeassistant-mDNS-listener;
+
+        proxy_responses 1;
+    }
+{{- end }} 
 }
 EOH
       }
 
       resources {
-        memory = 50
-        cpu    = 50
+        memory = 20
+        cpu    = 20
       }
     }
   }
