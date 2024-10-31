@@ -76,7 +76,7 @@ job "consul-ingress" {
               protocol = "tcp"
 
               service {
-                name = "cloudflare-dyndns"
+                name = "cloudflare-dnsupdate"
               }
             }
             # Loki ingress, simplifies logging from the DMZ
