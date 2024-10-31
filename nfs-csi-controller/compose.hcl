@@ -1,5 +1,5 @@
 job "csi-nfs" {
-  datacenters = ["home", "dmz"]
+  datacenters = ["arbiter", "home", "dmz"]
   type = "system" # ensures that all nodes in the DC have a copy.
 
   group "plugin" {
@@ -40,8 +40,8 @@ job "csi-nfs" {
   group "controller" {
 
     constraint {
-      attribute = "${node.class}"
-      value     = "compute"
+      attribute = "${node.datacenter}"
+      value     = "home"
     }
 
     task "controller" {
