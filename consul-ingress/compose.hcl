@@ -9,13 +9,18 @@ job "consul-ingress" {
 
       # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
       port  "smtp" { static = 25 }
+
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
+
       port  "cloudflare-dyndns" { static = 1080 }
+      
       port  "loki" { static = 3100 }
       
       port  "unifi-speedtest" { static = 6789 }
       port  "unifi-inform" { static = 8080 }
+
+      port  "homeassistant-homekit" { static = 21063 }
 
       port  "envoy_metrics" { to = 9102 }
     }
