@@ -4,13 +4,10 @@ job "traefik" {
 
   # Traefik instance for the home (internal) network
   group "traefik-home" {
+
     constraint {
       attribute = "${node.datacenter}"
       value     = "home"
-    }
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
     }
 
     network {
@@ -80,7 +77,6 @@ job "traefik" {
 
       port = 80
 
-      tags = ["home"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_http}" # make envoy metrics port available in Consul
       }
@@ -106,8 +102,8 @@ job "traefik" {
       name = "traefik-home-https"
 
       port = 443
-      tags = ["home"]
 
+      tags = ["home"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_https}" # make envoy metrics port available in Consul
       }
@@ -243,7 +239,6 @@ EOH
 
       port = 80
 
-      tags = ["dmz"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_dmz_http}" # make envoy metrics port available in Consul
       }

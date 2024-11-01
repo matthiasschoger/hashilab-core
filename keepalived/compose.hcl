@@ -2,11 +2,6 @@ job "keepalived" {
   datacenters = ["home"]
   type = "system"
 
-  constraint {
-    attribute = "${node.class}"
-    value     = "compute"
-  }
-
   group "keepalived" {
 
     task "keepalived" {

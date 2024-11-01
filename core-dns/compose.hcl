@@ -4,11 +4,6 @@ job "coredns" {
 
   group "coredns" {
 
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
-
     network {
       port "dns" { static = "53"  }
       port "metrics" { static = "9153" }

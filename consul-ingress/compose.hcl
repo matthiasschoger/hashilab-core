@@ -3,10 +3,6 @@ job "consul-ingress" {
   type        = "system"
 
   group "ingress-tcp" {
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
 
     network {
       mode = "bridge"
@@ -157,10 +153,6 @@ job "consul-ingress" {
 
   # Ingress proxy for UDP traffic
   group "ingress-udp" {
-    constraint {
-      attribute = "${node.class}"
-      value     = "compute"
-    }
 
     network {
       mode = "host"
