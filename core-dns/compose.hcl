@@ -5,23 +5,25 @@ job "coredns" {
   group "coredns" {
 
     network {
+      mode = "bridge"
+
       port "dns" { static = "53"  }
-      port "metrics" { static = "9153" }
-      port "health" { }
+      # port "metrics" { static = "9153" }
+      # port "health" { }
     }
 
    task "server" {
       driver = "docker"
 
       config {
-        # fixed version tag to allow for container caching
-        # "latest" will always pull a new container from DockerHub, which would fail if no DNS is available
+        # pinned version tag to allow for container caching
+        # "latest" will always pull a new container from DockerHub, which might fail if no DNS is available
         image = "coredns/coredns:1.11.3" 
 
         args = ["-conf", "/local/coredns/corefile"]
 
-        network_mode = "host"
-        ports = ["dns", "metrics", "health"]
+        # network_mode = "host"
+        # ports = ["dns", "metrics", "health"]
       }
 
       env {
