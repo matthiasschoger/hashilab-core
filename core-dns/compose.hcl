@@ -54,7 +54,7 @@ fritz.box.:53 {
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
 
-### *.lab.schoger.net Traefik reverse proxy
+### *.lab.schoger.net floating IP
 lab.schoger.net.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
@@ -95,7 +95,7 @@ consul. {
   bind {{ env "NOMAD_IP_dns" }}
 
   cache {
-    success 100              # cache 100*256 DNS entries max
+    success 1000             # cache 1000*256 DNS entries max
 
     prefetch 5 10m           # prefetch entries which saw 5 queries in 10 minutes before they become stale
     serve_stale 1h immediate # serve stale cache entries (max age 1h), then validate
@@ -136,7 +136,7 @@ lab.schoger.net.         IN NS	 ns2.lab.schoger.net.
 ns1               IN A   192.168.0.30
 ns2               IN A   192.168.0.31
 
-{{- /*  Point domains to the Traefik reverse proxy listening to the floating IP from keepalived */}}
+{{- /*  Point domains to the floating IP from keepalived */}}
 ; services - A records
 lab.schoger.net.         IN A   192.168.0.3
 *                        IN A   192.168.0.3
