@@ -1,5 +1,5 @@
 job "csi-nfs" {
-  datacenters = ["arbiter", "home", "dmz"]
+  datacenters = ["home", "dmz"]
   type = "system" # ensures that all nodes in the DCs have a copy.
 
   group "plugin" {
