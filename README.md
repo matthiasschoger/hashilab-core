@@ -22,10 +22,14 @@ To keep the jobs manageable, I've split them into three repositories
 
 The "core" repository defines a bare-bone HA setup based on Nomad an Consul (Connect). 
 
-CoreDNS resolves requests to *.lab.schoger.net to the floating IP managed by keepalived, assigned to one of the two compute nodes. Both compute nodes run an Consul ingress gateway, which picks up the traffic and routes it to Traefik, where the traffic is finally routed to the target service based on annotations on that service. Super simple once it is set up.
+CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keepalived, assigned to one of the two compute nodes. Both compute nodes run an Consul ingress gateway, which picks up the traffic and routes it to Traefik, where the traffic is finally routed to the target service based on annotations on that service. Super simple once it is set up.
 
 - consul-ingress - Picks up the traffic incoming into the cluster and routes it to the destination services via the Consul Connect Software Define Network. Routing of UDP traffic is handles by NGINX since Consul Connect is unfortunately TCP only.
 - core-dns - I can't tell how much I love that thing. "it's always DNS", but with CoreDNS I can be sure that DNS is always working. Stateless, no moving parts, and spread over the two compute nodes. Robust as hell and does what it's supposed to do. 
 - keepalived - Load-balancer which assigns a floating IP to one of the compute nodes. Assures that the floating IP points to a live node as long as one is available.
 - nfs-csi-contoller - CSI which allows to mount NFS shares from my Synology into Nomad services and assures that only a single alloc in accessing the persistant data on the NAS share.
 - traefik - Reverse proxy which picks up configurations from service annotations and routes the traffic from the ingress gateway to those services. Also provides Let's Encrypt certificates for all my services.
+
+Note: Before deploying a job file, you should set the following environment variable on the deploying machine
+- NOMAD_VAR_base_domain=domain.tld
+where 'domain.tld' is the domain you are using.

@@ -1,7 +1,7 @@
 http:
   routers:
     proxmox:
-      rule: Host(`proxmox.lab.schoger.net`)
+      rule: Host(`proxmox.lab.${var.base_domain}`)
       service: proxmox@file
       entrypoints: websecure
 

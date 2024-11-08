@@ -1,3 +1,7 @@
+variable "base_domain" {
+  default = "missing.environment.variable"
+}
+
 job "traefik" {
   datacenters = ["home", "dmz"]
   type        = "service"
@@ -66,7 +70,7 @@ job "traefik" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik.rule=Host(`lab.schoger.net`) || Host(`traefik.lab.schoger.net`)",
+        "traefik.http.routers.traefik.rule=Host(`lab.${var.base_domain}`) || Host(`traefik.lab.${var.base_domain}`)",
         "traefik.http.routers.traefik.service=api@internal",
         "traefik.http.routers.traefik.entrypoints=websecure"
       ]
@@ -228,7 +232,7 @@ EOH
       tags = [ # registers the DMZ Traefik instance with the home instance
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.schoger.net`)",
+        "traefik.http.routers.traefik-dmz.rule=Host(`dmz.lab.${var.base_domain}`)",
         "traefik.http.routers.traefik-dmz.entrypoints=websecure"
       ]
     }
@@ -275,14 +279,14 @@ EOH
       }
 
       template {
-        destination = "${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.crt"
+        destination = "${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt"
         perms = "600"
         data = <<EOH
 {{- with nomadVar "nomad/jobs/traefik" }}{{- .origin_certificate }}{{- end }}
 EOH
       }
       template {
-        destination = "${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.key"
+        destination = "${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.key"
         perms = "600"
         data = <<EOH
 {{- with nomadVar "nomad/jobs/traefik" }}{{- .origin_private_key }}{{- end }}
@@ -309,8 +313,8 @@ entryPoints:
 
 tls:
   certificates:
-    - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.crt
-      keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/schoger.net.key
+    - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt
+      keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.key
 
 api:
   dashboard: true

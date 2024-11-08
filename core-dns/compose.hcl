@@ -1,3 +1,7 @@
+variable "base_domain" {
+  default = "missing.environment.variable"
+}
+
 job "coredns" {
   datacenters = ["home"]
   type        = "system"
@@ -33,7 +37,7 @@ job "coredns" {
         cpu    = 100
       }
 
-      #templates (corefile + lab.schoger.net zone file)
+      #templates (corefile + lab.domain.tld zone file)
       template {
         destination = "local/coredns/corefile"
         change_mode   = "signal"
@@ -54,11 +58,11 @@ fritz.box.:53 {
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
 
-### *.lab.schoger.net floating IP
-lab.schoger.net.:53 {
+### *.lab.${var.base_domain} floating IP
+lab.${var.base_domain}.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
-  file /local/coredns/zones/db.net.schoger.lab lab.schoger.net
+  file /local/coredns/zones/db.net.schoger.lab lab.${var.base_domain}
   header { 
     response set ra # set RecursionAvailable flag
   }
@@ -119,9 +123,9 @@ EOH
         change_signal = "SIGUSR1"
         destination = "local/coredns/zones/db.net.schoger.lab"
         data = <<EOH
-$ORIGIN lab.schoger.net.
+$ORIGIN lab.${var.base_domain}.
 $TTL    604800
-lab.schoger.net.  IN SOA	ns1.lab.schoger.net. admin.lab.schoger.net. (
+lab.${var.base_domain}.  IN SOA	ns1.lab.${var.base_domain}. admin.lab.${var.base_domain}. (
                   1        ; Serial, TODO: use timestamp
              604800        ; Refresh
               86400        ; Retry
@@ -129,8 +133,8 @@ lab.schoger.net.  IN SOA	ns1.lab.schoger.net. admin.lab.schoger.net. (
              604800 )      ; Negative Cache TTL
 
 ; name servers - NS records
-lab.schoger.net.         IN NS	 ns1.lab.schoger.net.
-lab.schoger.net.         IN NS	 ns2.lab.schoger.net.
+lab.${var.base_domain}.         IN NS	 ns1.lab.${var.base_domain}.
+lab.${var.base_domain}.         IN NS	 ns2.lab.${var.base_domain}.
 
 ; name servers - A records
 ns1               IN A   192.168.0.30
@@ -138,7 +142,7 @@ ns2               IN A   192.168.0.31
 
 {{- /*  Point domains to the floating IP from keepalived */}}
 ; services - A records
-lab.schoger.net.         IN A   192.168.0.3
+lab.${var.base_domain}.         IN A   192.168.0.3
 *                        IN A   192.168.0.3
 
 EOH
