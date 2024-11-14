@@ -18,8 +18,8 @@ job "keepalived" {
         cap_add = ["NET_ADMIN", "NET_BROADCAST", "NET_RAW"]
       }
 
-      # FIXME: filter for only nodes with class = "compute"
-      # {{- if eq .NodeClass "compute" }} # does not work
+      # FIXME: filter for only nodes with datacenter = "home"
+      # {{- if eq .Datacenter "home" }} # does not work since Consul only has one DC
       # https://developer.hashicorp.com/nomad/api-docs/nodes
       template {
         destination = "local/keepalived/env.yaml"
