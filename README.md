@@ -36,3 +36,5 @@ Before deploying a job file, you should set the following environment variable o
 - NOMAD_VAR_base_domain=domain.tld
 
 where 'domain.tld' is the domain you are using.
+
+In addition, quite a few sensitive settings like passwords and email are stored in Nomad variables. Search for "nomadVar" to find the relevant locations.

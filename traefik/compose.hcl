@@ -20,9 +20,8 @@ job "traefik" {
       port "metrics" { to = 8080 } # Prometheus metrics via API port
 
       port "envoy_metrics_api" { to = 9102 }
-      port "envoy_metrics_home_https" { to = 9103 }
-      port "envoy_metrics_cloudflare" { to = 9104 }
-      port "envoy_metrics_home_http" { to = 9105 }
+      port "envoy_metrics_home_http" { to = 9103 }
+      port "envoy_metrics_home_https" { to = 9104 }
     }
 
     ephemeral_disk {
@@ -88,7 +87,7 @@ job "traefik" {
         sidecar_service {
           proxy {
             config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9105"
+              envoy_prometheus_bind_addr = "0.0.0.0:9103"
             }
           }
         }
@@ -107,7 +106,6 @@ job "traefik" {
 
       port = 443
 
-      tags = ["home"]
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_home_https}" # make envoy metrics port available in Consul
       }
@@ -115,7 +113,7 @@ job "traefik" {
         sidecar_service {
           proxy {
             config {
-              envoy_prometheus_bind_addr = "0.0.0.0:9103"
+              envoy_prometheus_bind_addr = "0.0.0.0:9104"
             }
           }
         }

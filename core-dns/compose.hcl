@@ -62,7 +62,7 @@ fritz.box.:53 {
 lab.${var.base_domain}.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
-  file /local/coredns/zones/db.net.schoger.lab lab.${var.base_domain}
+  file /local/coredns/zones/db.home.lab lab.${var.base_domain}
   header { 
     response set ra # set RecursionAvailable flag
   }
@@ -121,7 +121,7 @@ EOH
       template {
         change_mode   = "signal"
         change_signal = "SIGUSR1"
-        destination = "local/coredns/zones/db.net.schoger.lab"
+        destination = "local/coredns/zones/db.home.lab"
         data = <<EOH
 $ORIGIN lab.${var.base_domain}.
 $TTL    604800

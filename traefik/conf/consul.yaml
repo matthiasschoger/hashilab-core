@@ -1,7 +1,8 @@
 http:
   routers:
     consul:
-      rule: Host(`consul.lab.${var.base_domain}`)   # FIXME: not working yet, URL error
+#      rule: Host(`consul.lab.${var.base_domain}`)
+      rule: Host(`consul.lab.schoger.net`)
       service: consul@file
       entrypoints: websecure
 
@@ -9,6 +10,4 @@ http:
     consul:
       loadBalancer:
         servers:
-          - url: "http://master.home:8500"
-          - url: "http://compute1.home:8500"
-          - url: "http://compute2.home:8500"
+          - url: "http://{{ env "attr.unique.network.ip-address" }}:8500"
