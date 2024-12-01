@@ -187,16 +187,23 @@ EOH
     network {
       mode = "bridge"
 
-      port "metrics" { to = 8080 } # Prometheus metrics via API port
+      port "metrics" { to = 1080 } # Traefik metrics via API port
+      port "crowdsec_metrics" { to = 6060 } # Crowdsec metrics 
 
       port "envoy_metrics_api" { to = 9102 }
       port "envoy_metrics_dmz_http" { to = 9103 }
     }
 
+    ephemeral_disk {
+      # Used to cache Crowdsec transient data, Nomad will try to preserve the disk between job updates.
+      size    = 300 # MB
+      migrate = true
+    }
+
     service {
       name = "traefik-dmz-api"
 
-      port = 8080
+      port = 1080
 
       check {
         type     = "http"
@@ -209,6 +216,7 @@ EOH
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics_api}" # make envoy metrics port available in Consul
         metrics_port = "${NOMAD_HOST_PORT_metrics}"
+        crowdsec_metrics_port = "${NOMAD_HOST_PORT_crowdsec_metrics}"
       }
       connect {
         sidecar_service { 
@@ -295,6 +303,9 @@ EOH
         destination = "local/traefik.yaml"
         data = <<EOH
 providers:
+  file:
+    directory: "/local/conf"
+    watch: false
   consulcatalog:
     prefix: "dmz"
     connectaware: true
@@ -303,11 +314,24 @@ providers:
     endpoint:
       address: "http://consul.service.consul:8500"
 
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.3.5
+    cloudflare:
+      moduleName: github.com/agence-gaya/traefik-plugin-cloudflare
+      version: v1.2.0
+
 entryPoints:
   cloudflare:
     address: :80
+    http:
+      middlewares:
+        - cloudflare@file  # rewrite requesting IP from CF
+        - crowdsec@file    # crowdsec bouncer
   traefik:
-    address: :8080
+    address: :1080
 
 tls:
   certificates:
@@ -325,6 +349,18 @@ log:
   level: INFO
 #  level: DEBUG
 
+accessLog:
+  filePath: {{ env "NOMAD_ALLOC_DIR" }}/traefik/access.log # Traefik access log location
+  format: json
+  filters:
+    statusCodes:
+      - "200-299"  # log successful http requests
+      - "400-599"  # log failed http requests
+  bufferingSize: 0 # collect logs as in-memory buffer before writing into log file
+  fields:
+    headers:
+      defaultMode: keep
+
 metrics:
   prometheus:
     addEntryPointsLabels: true
@@ -336,10 +372,122 @@ global:
 EOH
       }
 
+      template {
+        destination = "local/conf/crowdsec.yaml"
+        data = <<EOH
+http:
+  middlewares:
+    cloudflare: # rewrites true request IP from CF header
+      plugin:
+        cloudflare:
+          trustedCIDRs: [0.0.0.0/0] # allow all IPs
+          overwriteRequestHeader: true
+    crowdsec: # crowdsec
+      plugin:
+        bouncer:
+          enabled: true
+          defaultDecisionSeconds: 60
+          crowdsecMode: live
+          crowdsecAppsecEnabled: false
+          crowdsecAppsecHost: localhost:7422
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecUnreachableBlock: true
+          crowdsecLapiKey: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .crowdsec_bouncer_token }}{{- end }}"
+          crowdsecLapiHost: localhost:8080
+          crowdsecLapiScheme: http
+          crowdsecLapiTLSInsecureVerify: false
+          forwardedHeadersTrustedIPs:
+            # private class ranges
+            - 192.168.0.0/16
+          clientTrustedIPs:
+            # private class ranges
+            - 192.168.0.0/16
+EOH
+      }
+
       resources {
         memory = 128
         cpu    = 400
       }
+    }
+  
+
+    # see https://blog.lrvt.de/configuring-crowdsec-with-traefik/
+    task "crowdsec" {
+
+      driver = "docker"
+
+      config {
+        image = "crowdsecurity/crowdsec:latest"
+
+        mounts = [ # map config files into container
+          {
+            type   = "bind"
+            source = "local/crowdsec/config.yaml.local"
+            target = "/etc/crowdsec/config.yaml.local"
+          },
+          {
+            type   = "bind"
+            source = "local/crowdsec/acquis.yaml"
+            target = "/etc/crowdsec/acquis.yaml"
+          }
+
+        ]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
+
+        COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios"
+      }
+
+      template {
+        destination = "/local/crowdsec/config.yaml.local"
+        data = <<EOH
+common:
+#  log_level: debug
+  log_level: info
+
+# config_paths:
+#   data_dir: "{{ env "NOMAD_ALLOC_DIR" }}/data/crowdsec"
+
+prometheus:
+  enabled: true
+  level: full
+  listen_addr: 0.0.0.0
+
+EOH
+      }
+
+
+      template {
+        destination = "/local/crowdsec/acquis.yaml"
+        data = <<EOH
+poll_without_inotify: false
+filenames:
+  - {{ env "NOMAD_ALLOC_DIR" }}/traefik/*.log # Traefik access log location
+labels:
+  type: traefik
+
+EOH
+      }
+
+      resources {
+        memory = 128
+        cpu    = 100
+      }
+
+      volume_mount {
+        volume      = "crowdsec"
+        destination = "/var/lib/crowdsec/data"
+      }    
+    }
+  
+    volume "crowdsec" {
+      type            = "csi"
+      source          = "crowdsec"
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
     }
   }
 }
