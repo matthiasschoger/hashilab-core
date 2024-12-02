@@ -136,7 +136,7 @@ job "traefik" {
       config {
         image = "traefik:latest"
 
-        args = [ "--configFile=/local/traefik.yaml" ]
+        args = [ "--configFile=/local/traefik-home.yaml" ]
       }
 
       env {
@@ -155,12 +155,12 @@ EOH
       }
 
       template {
-        destination = "local/traefik.yaml"
-        data        = file("traefik.yaml")
+        destination = "local/traefik-home.yaml"
+        data        = file("traefik-home.yaml")
       }
 
       dynamic "template" {
-        for_each = fileset(".", "conf/*")
+        for_each = fileset(".", "conf-home/*")
 
         content {
           data            = file(template.value)
@@ -277,7 +277,7 @@ EOH
       config {
         image = "traefik:latest"
 
-        args = [ "--configFile=/local/traefik.yaml" ]
+        args = [ "--configFile=/local/traefik-dmz.yaml" ]
       }
 
       env {
@@ -300,109 +300,17 @@ EOH
       }
 
       template {
-        destination = "local/traefik.yaml"
-        data = <<EOH
-providers:
-  file:
-    directory: "/local/conf"
-    watch: false
-  consulcatalog:
-    prefix: "dmz"
-    connectaware: true
-    exposedByDefault: false
-    servicename: "traefik-dmz-api" # connects Traefik to the Consul service
-    endpoint:
-      address: "http://consul.service.consul:8500"
-
-experimental:
-  plugins:
-    bouncer:
-      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-      version: v1.3.5
-    cloudflare:
-      moduleName: github.com/agence-gaya/traefik-plugin-cloudflare
-      version: v1.2.0
-
-entryPoints:
-  cloudflare:
-    address: :80
-    http:
-      middlewares:
-        - cloudflare@file  # rewrite requesting IP from CF
-        - crowdsec@file    # crowdsec bouncer
-  traefik:
-    address: :1080
-
-tls:
-  certificates:
-    - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt
-      keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.key
-
-api:
-  dashboard: true
-  insecure: true
-
-ping:
-  entryPoint: "traefik"
-
-log:
-  level: INFO
-#  level: DEBUG
-
-accessLog:
-  filePath: {{ env "NOMAD_ALLOC_DIR" }}/traefik/access.log # Traefik access log location
-  format: json
-  filters:
-    statusCodes:
-      - "200-299"  # log successful http requests
-      - "400-599"  # log failed http requests
-  bufferingSize: 0 # collect logs as in-memory buffer before writing into log file
-  fields:
-    headers:
-      defaultMode: keep
-
-metrics:
-  prometheus:
-    addEntryPointsLabels: true
-    addRoutersLabels: true
-    addServicesLabels: true
-
-global:
-  sendanonymoususage: true # Periodically send anonymous usage statistics.
-EOH
+        destination = "local/traefik-dmz.yaml"
+        data        = file("traefik-dmz.yaml")
       }
 
-      template {
-        destination = "local/conf/crowdsec.yaml"
-        data = <<EOH
-http:
-  middlewares:
-    cloudflare: # rewrites true request IP from CF header
-      plugin:
-        cloudflare:
-          trustedCIDRs: [0.0.0.0/0] # allow all IPs
-          overwriteRequestHeader: true
-    crowdsec: # crowdsec
-      plugin:
-        bouncer:
-          enabled: true
-          defaultDecisionSeconds: 60
-          crowdsecMode: live
-          crowdsecAppsecEnabled: false
-          crowdsecAppsecHost: localhost:7422
-          crowdsecAppsecFailureBlock: true
-          crowdsecAppsecUnreachableBlock: true
-          crowdsecLapiKey: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .crowdsec_bouncer_token }}{{- end }}"
-          crowdsecLapiHost: localhost:8080
-          crowdsecLapiScheme: http
-          crowdsecLapiTLSInsecureVerify: false
-          forwardedHeadersTrustedIPs:
-            # private class ranges
-            - 192.168.0.0/16
-          clientTrustedIPs:
-            # private class ranges
-            - 192.168.0.0/16
-EOH
+      dynamic "template" {
+        for_each = fileset(".", "conf-dmz/*")
+
+        content {
+          data            = file(template.value)
+          destination     = "local/${template.value}"
+        }
       }
 
       resources {

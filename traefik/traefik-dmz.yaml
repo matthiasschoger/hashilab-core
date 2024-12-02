@@ -1,0 +1,69 @@
+providers:
+  file:
+    directory: "/local/conf-dmz"
+    watch: false
+  consulcatalog:
+    prefix: "dmz"
+    connectaware: true
+    exposedByDefault: false
+    servicename: "traefik-dmz-api" # connects Traefik to the Consul service
+    endpoint:
+      address: "http://consul.service.consul:8500"
+
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.3.5
+    cloudflare:
+      moduleName: github.com/agence-gaya/traefik-plugin-cloudflare
+      version: v1.2.0
+
+entryPoints:
+  cloudflare:
+    address: :80
+    http:
+      middlewares:
+        - cloudflare@file  # rewrite requesting IP from CF
+        - crowdsec@file    # crowdsec bouncer
+  traefik:
+    address: :1080
+
+tls:
+  certificates:
+    - certFile: /secrets/certs/origin/schoger.net.crt
+      keyFile: /secrets/certs/origin/schoger.net.key
+    # - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt
+    #   keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.key
+
+api:
+  dashboard: true
+  insecure: true
+
+ping:
+  entryPoint: "traefik"
+
+log:
+  level: INFO
+#  level: DEBUG
+
+accessLog:
+  filePath: {{ env "NOMAD_ALLOC_DIR" }}/traefik/access.log # Traefik access log location
+  format: json
+  filters:
+    statusCodes:
+      - "200-299"  # log successful http requests
+      - "400-599"  # log failed http requests
+  bufferingSize: 0 # collect logs as in-memory buffer before writing into log file
+  fields:
+    headers:
+      defaultMode: keep
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+
+global:
+  sendanonymoususage: true # Periodically send anonymous usage statistics.

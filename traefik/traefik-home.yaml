@@ -2,7 +2,7 @@
 
 providers:
   file:
-    directory: "/local/conf"
+    directory: "/local/conf-home"
     watch: false
   consulcatalog:
     prefix: "traefik"

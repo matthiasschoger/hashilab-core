@@ -1,0 +1,27 @@
+http:
+  middlewares:
+    cloudflare: # rewrites true request IP from CF header
+      plugin:
+        cloudflare:
+          trustedCIDRs: [0.0.0.0/0] # allow all IPs, we're connected via CF tunnel
+          overwriteRequestHeader: true
+    crowdsec: # crowdsec
+      plugin:
+        bouncer:
+          enabled: true
+          defaultDecisionSeconds: 60
+          crowdsecMode: live
+          crowdsecAppsecEnabled: false
+          crowdsecAppsecHost: localhost:7422
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecUnreachableBlock: true
+          crowdsecLapiKey: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .crowdsec_bouncer_token }}{{- end }}"
+          crowdsecLapiHost: localhost:8080
+          crowdsecLapiScheme: http
+          crowdsecLapiTLSInsecureVerify: false
+          forwardedHeadersTrustedIPs:
+            # private class ranges
+            - 192.168.0.0/16
+          clientTrustedIPs:
+            # private class ranges
+            - 192.168.0.0/16
