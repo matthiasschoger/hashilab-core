@@ -285,6 +285,14 @@ EOH
       }
 
       template {
+        destination = "local/variables.env"
+        env         = true
+        data        = <<EOH
+BASE_DOMAIN = "${var.base_domain}"
+EOH
+      }
+
+      template {
         destination = "${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt"
         perms = "600"
         data = <<EOH
@@ -339,14 +347,14 @@ EOH
             source = "local/crowdsec/acquis.yaml"
             target = "/etc/crowdsec/acquis.yaml"
           }
-
         ]
       }
 
       env {
         TZ = "Europe/Berlin"
 
-        COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/sshd crowdsecurity/linux crowdsecurity/base-http-scenarios"
+        COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/linux crowdsecurity/base-http-scenarios"
+        TRUSTED_PROXIES = "0.0.0.0/0,::/0"
       }
 
       template {
@@ -355,9 +363,6 @@ EOH
 common:
 #  log_level: debug
   log_level: info
-
-# config_paths:
-#   data_dir: "{{ env "NOMAD_ALLOC_DIR" }}/data/crowdsec"
 
 prometheus:
   enabled: true
@@ -382,18 +387,30 @@ EOH
 
       resources {
         memory = 128
-        cpu    = 100
+        cpu    = 400
       }
 
       volume_mount {
-        volume      = "crowdsec"
+        volume      = "crowdsec-db"
         destination = "/var/lib/crowdsec/data"
+      }    
+
+      volume_mount {
+        volume      = "crowdsec-etc"
+        destination = "/etc/crowdsec"
       }    
     }
   
-    volume "crowdsec" {
+    volume "crowdsec-db" {
       type            = "csi"
-      source          = "crowdsec"
+      source          = "crowdsec-db"
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+    }
+  
+    volume "crowdsec-etc" {
+      type            = "csi"
+      source          = "crowdsec-etc"
       access_mode     = "single-node-writer"
       attachment_mode = "file-system"
     }

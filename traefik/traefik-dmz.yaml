@@ -15,17 +15,40 @@ experimental:
     bouncer:
       moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       version: v1.3.5
-    cloudflare:
-      moduleName: github.com/agence-gaya/traefik-plugin-cloudflare
-      version: v1.2.0
 
 entryPoints:
   cloudflare:
     address: :80
     http:
       middlewares:
-        - cloudflare@file  # rewrite requesting IP from CF
         - crowdsec@file    # crowdsec bouncer
+    forwardedHeaders:
+      trustedIPs:
+        # Start of Cloudlare's public IP list
+        - 127.0.0.1/32
+        - 103.21.244.0/22
+        - 103.22.200.0/22
+        - 103.31.4.0/22
+        - 104.16.0.0/13
+        - 104.24.0.0/14
+        - 108.162.192.0/18
+        - 131.0.72.0/22
+        - 141.101.64.0/18
+        - 162.158.0.0/15
+        - 172.64.0.0/13
+        - 173.245.48.0/20
+        - 188.114.96.0/20
+        - 190.93.240.0/20
+        - 197.234.240.0/22
+        - 198.41.128.0/17
+        - 2400:cb00::/32
+        - 2606:4700::/32
+        - 2803:f800::/32
+        - 2405:b500::/32
+        - 2405:8100::/32
+        - 2a06:98c0::/29
+        - 2c0f:f248::/32
+        # End of Cloudlare's public IP list
   traefik:
     address: :1080
 
@@ -33,8 +56,8 @@ tls:
   certificates:
     - certFile: /secrets/certs/origin/schoger.net.crt
       keyFile: /secrets/certs/origin/schoger.net.key
-    # - certFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt
-    #   keyFile: ${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.key
+    # - certFile: {{env "NOMAD_SECRETS_DIR"}}/certs/origin/{{env "BASE_DOMAIN"}}.crt
+    #   keyFile: {{env "NOMAD_SECRETS_DIR"}}/certs/origin/{{env "BASE_DOMAIN"}}.key
 
 api:
   dashboard: true
@@ -47,17 +70,23 @@ log:
   level: INFO
 #  level: DEBUG
 
-accessLog:
+accessLog:         # access log will be analyzed by CrowdSec middleware
   filePath: {{ env "NOMAD_ALLOC_DIR" }}/traefik/access.log # Traefik access log location
   format: json
   filters:
     statusCodes:
       - "200-299"  # log successful http requests
       - "400-599"  # log failed http requests
-  bufferingSize: 0 # collect logs as in-memory buffer before writing into log file
+  bufferingSize: 0 # don't collect logs as in-memory buffer before writing into log file
   fields:
     headers:
       defaultMode: keep
+      names: # don't log overly chatty or sensitive headers
+        Authorization: drop
+        Cookie: drop
+        Content-Security-Policy: drop
+        Permissions-Policy: drop
+        cf_clearance: drop
 
 metrics:
   prometheus:

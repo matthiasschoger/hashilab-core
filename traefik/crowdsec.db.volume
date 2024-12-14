@@ -1,8 +1,8 @@
 
 plugin_id   = "nfs"
 type        = "csi"
-id          = "crowdsec"
-name        = "Crowdsec"
+id          = "crowdsec-db"
+name        = "Crowdsec DB"
 
 capability {
 	access_mode = "single-node-writer"
@@ -12,7 +12,7 @@ capability {
 context {
   server = "storage.home"
   share = "/volume2/homelab-dmz"
-  subDir = "crowdsec"
+  subDir = "crowdsec/db"
   mountPermissions = "0"  
 }
 
