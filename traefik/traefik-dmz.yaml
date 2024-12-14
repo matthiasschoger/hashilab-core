@@ -50,7 +50,7 @@ log:
   level: INFO
 #  level: DEBUG
 
-accessLog:         # access log will be analyzed by CrowdSec middleware
+accessLog:         # access log will be analyzed by CrowdSec container
   filePath: {{ env "NOMAD_ALLOC_DIR" }}/traefik/access.log # Traefik access log location
   format: json
   filters:
