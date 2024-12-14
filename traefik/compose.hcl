@@ -354,7 +354,6 @@ EOH
         TZ = "Europe/Berlin"
 
         COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/linux crowdsecurity/base-http-scenarios"
-        TRUSTED_PROXIES = "0.0.0.0/0,::/0"
       }
 
       template {

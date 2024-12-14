@@ -1,5 +1,9 @@
 http:
   middlewares:
+    cloudflarewarp:
+      plugin:
+        cloudflarewarp:
+          disableDefault: false
     crowdsec: # crowdsec
       plugin:
         bouncer:
@@ -15,10 +19,3 @@ http:
           crowdsecLapiHost: localhost:8080
           crowdsecLapiScheme: http
           crowdsecLapiTLSInsecureVerify: false
-          # ForwardedHeadersCustomName: FIXME
-          # forwardedHeadersTrustedIPs:
-          #   # private class ranges
-          #   - 192.168.0.0/16
-          # clientTrustedIPs:
-          #   # private class ranges
-          #   - 192.168.0.0/16
