@@ -2,7 +2,7 @@
 
 <h2>Motivation</h2>
 
-This project was born out of boredom during the Covid epedemic, when I wanted to replace my already existing Docker homelab with something more advanced. After playing around with k8s for a bit, I decided that Nomad is a great fit for a hobby project, compared to k8s which felt more like something you would do for a job.
+This project was born out of boredom during the Covid pandemic, when I wanted to replace my already existing Docker homelab with something more advanced. After playing around with k8s for a bit, I decided that Nomad is a great fit for a hobby project, compared to k8s which felt more like something you would do for a job.
 
 With k8s, it felt to me like I was reciting the rotes of the church of Helm, without really understanding what I was doing or why. With Nomad and Consul, I could "grok" the concepts without making it a job and find solutions to the specific issues I was facing.
 
@@ -22,7 +22,7 @@ To keep the jobs manageable, I've split them into three repositories
 
 The "core" repository defines a bare-bone HA setup based on Nomad and Consul (Connect). 
 
-CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keepalived, assigned to one of the two compute nodes. Both compute nodes run an Consul ingress gateway, which picks up the traffic and routes it to Traefik, where the traffic is finally routed to the target service based on annotations on that service. Super simple once it is set up.
+CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keepalived, assigned to one of the two compute nodes. Both compute nodes run an Consul ingress gateway, which picks up the traffic and routes it to traefik-home, where the traffic is finally routed to the target service based on annotations on that service. Super simple once it is set up.
 
 - consul-ingress - Picks up the traffic incoming into the cluster and routes it to traefik-home via the Consul Connect Software Define Network. Routing of UDP traffic is handled by NGINX since Consul Connect is unfortunately TCP only.
 - core-dns - "it's always DNS", but with CoreDNS I can be sure that DNS is always working. Stateless, no moving parts, and spread over the two compute nodes. Robust as hell and does what it's supposed to do. 
