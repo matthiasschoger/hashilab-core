@@ -353,7 +353,7 @@ EOH
       env {
         TZ = "Europe/Berlin"
 
-        COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/linux crowdsecurity/base-http-scenarios"
+        COLLECTIONS = "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching crowdsecurity/linux crowdsecurity/base-http-scenarios crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"
       }
 
       template {
@@ -375,6 +375,17 @@ EOH
       template {
         destination = "/local/crowdsec/acquis.yaml"
         data = <<EOH
+# appsec
+listen_addr: 127.0.0.1:7422
+appsec_config: crowdsecurity/appsec-default
+name: AppSecComponent
+source: appsec
+labels:
+  type: appsec
+
+---
+
+# Traefik
 poll_without_inotify: false
 filenames:
   - {{ env "NOMAD_ALLOC_DIR" }}/traefik/*.log # Traefik access log location

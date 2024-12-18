@@ -11,7 +11,7 @@ http:
 #          LogLevel: DEBUG
           defaultDecisionSeconds: 60
           crowdsecMode: live
-          crowdsecAppsecEnabled: false
+          crowdsecAppsecEnabled: true
           crowdsecAppsecHost: localhost:7422
           crowdsecAppsecFailureBlock: true
           crowdsecAppsecUnreachableBlock: true
