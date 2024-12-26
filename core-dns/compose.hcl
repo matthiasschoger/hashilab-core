@@ -43,6 +43,18 @@ job "coredns" {
         change_mode   = "signal"
         change_signal = "SIGUSR1"
         data = <<EOH
+### snippets to use later
+(headers) {
+  header { 
+    response set ra # set RecursionAvailable flag
+  }
+}
+
+(default) {
+  errors
+  prometheus {{ env "NOMAD_ADDR_metrics" }}
+}
+
 ### fritz.box to resolve the network printer
 fritz.box.:53 {
   bind {{ env "NOMAD_IP_dns" }}
@@ -50,12 +62,9 @@ fritz.box.:53 {
   hosts {
     172.16.1.1  fritz.box
   }
-  header { 
-    response set ra # set RecursionAvailable flag
-  }
 
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
+  import headers
+  import default
 }
 
 ### *.lab.${var.base_domain} floating IP
@@ -63,12 +72,9 @@ lab.${var.base_domain}.:53 {
   bind {{ env "NOMAD_IP_dns" }}
 
   file /local/coredns/zones/db.home.lab lab.${var.base_domain}
-  header { 
-    response set ra # set RecursionAvailable flag
-  }
 
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
+  import headers
+  import default
 }
 
 ### Local devices from the DHCP server (UXG-lite)
@@ -77,21 +83,26 @@ home. {
 
   forward . 192.168.0.1:53 # router
 
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
+  import default
 }
+
+### Unifi devices for adoption
+# unifi {
+#   bind {{ env "NOMAD_IP_dns" }}
+
+#   forward . 192.168.0.1:53 # router
+
+#   import default
+# }
 
 ### services registered in the Consul catalog
 consul. {
   bind {{ env "NOMAD_IP_dns" }}
 
   forward . {{ env "NOMAD_IP_dns" }}:8600 # Consul running on the same machine
-  header { 
-    response set ra # set RecursionAvailable flag
-  }
 
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
+  import headers
+  import default
 }
 
 ### everything else (internet)
@@ -111,8 +122,7 @@ consul. {
   {{- end}} 
   forward . {{ $dns_forward }}{{- /* generate forward entry */}}
   
-  errors
-  prometheus {{ env "NOMAD_ADDR_metrics" }}
+  import default
 }
 
 EOH
