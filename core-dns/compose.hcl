@@ -20,7 +20,7 @@ job "coredns" {
       config {
         # fixed version tag to allow for container caching
         # "latest" will always pull a new container from DockerHub, which would fail if no DNS is available
-        image = "coredns/coredns:1.11.3" 
+        image = "coredns/coredns:1.12.0" 
 
         args = ["-conf", "/local/coredns/corefile"]
 
