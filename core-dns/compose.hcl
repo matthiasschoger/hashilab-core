@@ -43,7 +43,7 @@ job "coredns" {
         change_mode   = "signal"
         change_signal = "SIGUSR1"
         data = <<EOH
-### snippets to use later
+### snippets for later use
 (headers) {
   header { 
     response set ra # set RecursionAvailable flag
@@ -61,18 +61,6 @@ fritz.box. {
 
   hosts {
     172.16.1.1  fritz.box
-  }
-
-  import headers
-  import default
-}
-
-### 
-unifi. {
-  bind {{ env "NOMAD_IP_dns" }}
-
-  hosts {
-    192.168.0.3  unifi
   }
 
   import headers
@@ -156,7 +144,7 @@ ns2               IN A   192.168.0.31
 {{- /*  Point domains to the floating IP from keepalived */}}
 ; services - A records
 lab.${var.base_domain}.         IN A   192.168.0.3
-*                        IN A   192.168.0.3
+*                 IN A   192.168.0.3
 
 EOH
       }
