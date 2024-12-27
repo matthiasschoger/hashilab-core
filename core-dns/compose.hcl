@@ -56,7 +56,7 @@ job "coredns" {
 }
 
 ### fritz.box to resolve the network printer
-fritz.box.:53 {
+fritz.box. {
   bind {{ env "NOMAD_IP_dns" }}
 
   hosts {
@@ -67,8 +67,20 @@ fritz.box.:53 {
   import default
 }
 
+### 
+unifi. {
+  bind {{ env "NOMAD_IP_dns" }}
+
+  hosts {
+    192.168.0.3  unifi
+  }
+
+  import headers
+  import default
+}
+
 ### *.lab.${var.base_domain} floating IP
-lab.${var.base_domain}.:53 {
+lab.${var.base_domain}. {
   bind {{ env "NOMAD_IP_dns" }}
 
   file /local/coredns/zones/db.home.lab lab.${var.base_domain}
@@ -85,15 +97,6 @@ home. {
 
   import default
 }
-
-### Unifi devices for adoption
-# unifi {
-#   bind {{ env "NOMAD_IP_dns" }}
-
-#   forward . 192.168.0.1:53 # router
-
-#   import default
-# }
 
 ### services registered in the Consul catalog
 consul. {
