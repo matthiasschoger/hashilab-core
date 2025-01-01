@@ -126,8 +126,8 @@ EOH
         data = <<EOH
 $ORIGIN lab.${var.base_domain}.
 $TTL    604800
-lab.${var.base_domain}.  IN SOA	ns1.lab.${var.base_domain}. admin.lab.${var.base_domain}. (
-                  1        ; Serial, TODO: use timestamp
+lab.${var.base_domain}.         IN SOA	ns1.lab.${var.base_domain}. admin.lab.${var.base_domain}. (
+         {{ timestamp "unix" }}        ; Serial, current unix timestamp
              604800        ; Refresh
               86400        ; Retry
             2419200        ; Expire
@@ -138,13 +138,13 @@ lab.${var.base_domain}.         IN NS	 ns1.lab.${var.base_domain}.
 lab.${var.base_domain}.         IN NS	 ns2.lab.${var.base_domain}.
 
 ; name servers - A records
-ns1               IN A   192.168.0.30
-ns2               IN A   192.168.0.31
+ns1                      IN A   192.168.0.30
+ns2                      IN A   192.168.0.31
 
 {{- /*  Point domains to the floating IP from keepalived */}}
 ; services - A records
 lab.${var.base_domain}.         IN A   192.168.0.3
-*                 IN A   192.168.0.3
+*                        IN A   192.168.0.3
 
 EOH
       }
