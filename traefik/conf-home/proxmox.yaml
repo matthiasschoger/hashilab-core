@@ -12,17 +12,13 @@ http:
         healthCheck: {}
         services:
         - name: proxmox0
-          weight: 10
         - name: proxmox1
-          weight: 1
         - name: proxmox2
-          weight: 1
 
     proxmox0:
       loadBalancer:
         passHostHeader: true
         healthCheck:
-          path: /api2/json/access/ticket
           interval: 5s
           timeout: 2s
         servers:
@@ -32,7 +28,6 @@ http:
       loadBalancer:
         passHostHeader: true
         healthCheck:
-          path: /api2/json/access/ticket
           interval: 5s
           timeout: 2s
         servers:
@@ -42,7 +37,6 @@ http:
       loadBalancer:
         passHostHeader: true
         healthCheck:
-          path: /api2/json/access/ticket
           interval: 5s
           timeout: 2s
         servers:
