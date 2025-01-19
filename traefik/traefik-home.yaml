@@ -27,7 +27,7 @@ certificatesResolvers:
           - "1.0.0.1:53"
 
 entryPoints:
-  # internal
+  # redirect to https
   web:
     address: :80
     http:
@@ -35,10 +35,15 @@ entryPoints:
         entrypoint:
           to: websecure
           scheme: https
+  # internal https with LE certificate
   websecure:
     address: :443
     http:
-      tls: 
+      tls:        # wildcard for the whole lab
+        domains:    
+          - main: lab.schoger.net
+            sans:
+              - "*.lab.schoger.net"
         options: strict_tls@file
         certResolver: le
   # Traefik API
@@ -46,7 +51,7 @@ entryPoints:
     address: :8080
 
 serversTransport:
-  insecureSkipVerify: true # trust internal TLS connection without cert validation
+  insecureSkipVerify: false # traffic is secured by Consul Connect
   
 api:
   dashboard: true
