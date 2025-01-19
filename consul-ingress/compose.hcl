@@ -135,7 +135,7 @@ job "consul-ingress" {
 */          
           resources {
             cpu    = 100
-            memory = 64
+            memory = 128
           }
         }
       }
@@ -148,6 +148,7 @@ job "consul-ingress" {
     network {
       mode = "host"
 
+      # Unifi Network
       port "stun"         { static = 3478 }  # UDP
       port "discovery"    { static = 10001 } # UDP
       port "discovery-l2" { static = 1900 }  # UDP
@@ -227,7 +228,7 @@ EOH
       }
 
       resources {
-        memory = 20
+        memory = 32
         cpu    = 20
       }
     }
