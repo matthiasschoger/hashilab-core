@@ -51,7 +51,7 @@ entryPoints:
     address: :8080
 
 serversTransport:
-  insecureSkipVerify: false # traffic is secured by Consul Connect
+  insecureSkipVerify: false
   
 api:
   dashboard: true

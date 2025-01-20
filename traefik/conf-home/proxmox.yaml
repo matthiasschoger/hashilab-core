@@ -6,6 +6,10 @@ http:
       service: proxmox@file
       entrypoints: websecure
 
+  serversTransports:
+    proxmox:
+      insecureSkipVerify: true
+
   services:
     proxmox:
       weighted:
@@ -17,6 +21,7 @@ http:
 
     proxmox0:
       loadBalancer:
+        serversTransport: proxmox
         passHostHeader: true
         healthCheck:
           interval: 5s
@@ -26,6 +31,7 @@ http:
 
     proxmox1:
       loadBalancer:
+        serversTransport: proxmox
         passHostHeader: true
         healthCheck:
           interval: 5s
@@ -35,6 +41,7 @@ http:
 
     proxmox2:
       loadBalancer:
+        serversTransport: proxmox
         passHostHeader: true
         healthCheck:
           interval: 5s
