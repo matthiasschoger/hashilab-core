@@ -363,6 +363,13 @@ common:
 #  log_level: debug
   log_level: info
 
+config_paths:
+#  config_dir: "<path_to_crowdsec_config_folder>"
+  data_dir: "/alloc/data/crowdsec/data"
+
+#db_config:
+#  db_path:  "/alloc/data/crowdsec/db/crowdsec.db"
+
 prometheus:
   enabled: true
   level: full
