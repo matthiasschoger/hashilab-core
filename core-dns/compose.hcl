@@ -77,6 +77,18 @@ lab.${var.base_domain}. {
   import default
 }
 
+### resolve "unifi" to ingress gateway for Ubiquiti device adoption
+unifi. {
+  bind {{ env "NOMAD_IP_dns" }}
+
+  hosts {
+    192.168.0.3  unifi
+  }
+
+  import headers
+  import default
+}
+
 ### Local devices from the DHCP server (UXG-lite)
 home. {
   bind {{ env "NOMAD_IP_dns" }}
