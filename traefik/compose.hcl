@@ -285,14 +285,6 @@ EOH
       }
 
       template {
-        destination = "local/variables.env"
-        env         = true
-        data        = <<EOH
-BASE_DOMAIN = "${var.base_domain}"
-EOH
-      }
-
-      template {
         destination = "${NOMAD_SECRETS_DIR}/certs/origin/${var.base_domain}.crt"
         perms = "600"
         data = <<EOH
