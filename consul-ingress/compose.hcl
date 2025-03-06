@@ -7,7 +7,7 @@ job "consul-ingress" {
     network {
       mode = "bridge"
 
-      # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
+      # NOTE: Remember to add a port allocation to the network block when registering additional listeners!
       port  "smtp" { static = 25 }
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
@@ -23,7 +23,7 @@ job "consul-ingress" {
     service {
       name = "ingress-gateway"
 
-      tags = [ "diun.enable=false" ] # don't check with diun
+      tags = [ "diun.enable=false" ] # don't check with diun, the proxy container is packaged with Consul
 
       meta {
         envoy_metrics_port = "${NOMAD_HOST_PORT_envoy_metrics}" # make envoy metrics port available in Consul
@@ -38,7 +38,7 @@ job "consul-ingress" {
             # Additional options are documented at
             # https://www.nomadproject.io/docs/job-specification/gateway#ingress-parameters
 
-            # NOTE: Remember to add a port allocation to the network block when registering an additional listener!
+            # NOTE: Remember to add a port allocation to the network block when registering additional listeners!
 
             # Protonmail bridge
             listener {
@@ -93,7 +93,8 @@ job "consul-ingress" {
                 name = "unifi-network-speedtest"
               }
             }
-            # Unifi Network inform ingress, required for adopting Unifi devices on the network
+            # Unifi Network inform ingress, required for adopting Unifi devices on the network.
+            #  Default is http://unifi:8080, make sure that DNS is configured to the ingress IP accordingly.
             listener {
               port     = 8080
               protocol = "tcp"
@@ -159,7 +160,7 @@ job "consul-ingress" {
       driver = "docker"
 
       config {
-        image = "nginxinc/nginx-unprivileged:alpine"
+        image = "nginx:latest"
 
         volumes = [ "local/conf.d/stream.conf:/etc/nginx/stream.conf" ]
       }
