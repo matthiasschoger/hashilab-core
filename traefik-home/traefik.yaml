@@ -2,7 +2,7 @@
 
 providers:
   file:
-    directory: "/local/conf-home"
+    directory: "/local/conf"
     watch: false
   consulcatalog:
     prefix: "traefik"
@@ -16,7 +16,7 @@ providers:
 certificatesResolvers:
   le:
     acme:
-      email: "{{- with nomadVar "nomad/jobs/traefik" }}{{- .ca_email }}{{- end }}"
+      email: "{{- with nomadVar "nomad/jobs/traefik-home" }}{{- .ca_email }}{{- end }}"
       storage: "{{ env "NOMAD_ALLOC_DIR" }}/data/le.json"
       caServer: https://acme-v02.api.letsencrypt.org/directory # prod (default)
       # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging
