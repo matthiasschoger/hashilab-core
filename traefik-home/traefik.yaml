@@ -27,16 +27,15 @@ certificatesResolvers:
           - "1.0.0.1:53"
 
 entryPoints:
-  # redirect to https
-  web:
+  web:            # global redirct to https
     address: :80
     http:
-      redirections: # global redirct to https
+      redirections:
         entrypoint:
           to: websecure
           scheme: https
-  # internal https with LE certificate
-  websecure:
+          permanent: true
+  websecure:      # internal https with LE certificate
     address: :443
     http:
       tls:        # wildcard for the whole lab
@@ -45,9 +44,8 @@ entryPoints:
             sans:
               - "*.lab.schoger.net"
         options: strict_tls@file
-        certResolver: le
-  # Traefik API
-  traefik:
+        certResolver: le  
+  traefik:        # Traefik API
     address: :8080
 
 serversTransport:
