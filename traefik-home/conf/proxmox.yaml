@@ -23,6 +23,9 @@ http:
       loadBalancer:
         serversTransport: proxmox
         passHostHeader: true
+        sticky:
+          cookie:
+            name: "proxmox_session"
         healthCheck:
           interval: 5s
           timeout: 2s
@@ -33,6 +36,9 @@ http:
       loadBalancer:
         serversTransport: proxmox
         passHostHeader: true
+        sticky:
+          cookie:
+            name: "proxmox_session"
         healthCheck:
           interval: 5s
           timeout: 2s
@@ -43,6 +49,9 @@ http:
       loadBalancer:
         serversTransport: proxmox
         passHostHeader: true
+        sticky:
+          cookie:
+            name: "proxmox_session"
         healthCheck:
           interval: 5s
           timeout: 2s
