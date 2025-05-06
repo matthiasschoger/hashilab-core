@@ -151,6 +151,7 @@ job "consul-ingress" {
 
       # Unifi Network
       port "stun"         { static = 3478 }  # UDP
+      port "syslog"       { static = 5514 }  # UDP
       port "discovery"    { static = 10001 } # UDP
       port "discovery-l2" { static = 1900 }  # UDP
     }
@@ -188,6 +189,22 @@ stream {
     server {
         listen 3478 udp;
         proxy_pass unifi-network-stun;
+
+        proxy_responses 1;
+    }
+{{- end }} 
+
+{{ $unifi_network_syslog := service "unifi-network-syslog" }}
+{{- if $unifi_network_syslog }}
+    upstream unifi-network-syslog {
+  {{- range $unifi_network_syslog }}
+        server {{ print .Address ":" .Port }};
+  {{- end }} 
+    }
+
+    server {
+        listen 5514 udp;
+        proxy_pass unifi-network-syslog;
 
         proxy_responses 1;
     }
