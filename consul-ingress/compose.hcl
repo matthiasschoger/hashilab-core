@@ -178,14 +178,14 @@ job "consul-ingress" {
         data = <<EOH
 stream {
 
-{{- $unifi_network_stun := service "unifi-network-stun" }}
+    # UDP forwards for Unifi Network application
+{{ $unifi_network_stun := service "unifi-network-stun" }}
 {{- if $unifi_network_stun }}
     upstream unifi-network-stun {
   {{- range $unifi_network_stun }}
         server {{ print .Address ":" .Port }};
   {{- end }} 
     }
-
     server {
         listen 3478 udp;
         proxy_pass unifi-network-stun;
@@ -193,7 +193,6 @@ stream {
         proxy_responses 1;
     }
 {{- end }} 
-
 {{ $unifi_network_syslog := service "unifi-network-syslog" }}
 {{- if $unifi_network_syslog }}
     upstream unifi-network-syslog {
@@ -201,7 +200,6 @@ stream {
         server {{ print .Address ":" .Port }};
   {{- end }} 
     }
-
     server {
         listen 5514 udp;
         proxy_pass unifi-network-syslog;
@@ -209,7 +207,6 @@ stream {
         proxy_responses 1;
     }
 {{- end }} 
-
 {{ $unifi_network_discovery := service "unifi-network-discovery" }}
 {{- if $unifi_network_discovery }}
     upstream unifi-network-discovery {
@@ -217,7 +214,6 @@ stream {
         server {{ print .Address ":" .Port }};
   {{- end }} 
     }
-
     server {
         listen 10001 udp;
         proxy_pass unifi-network-discovery;
@@ -225,7 +221,6 @@ stream {
         proxy_responses 1;
     }
 {{- end }} 
-
 {{ $unifi_network_discovery_l2 := service "unifi-network-discovery-l2" }}
 {{- if $unifi_network_discovery_l2 }}
     upstream unifi-network-discovery-l2 {
@@ -233,7 +228,6 @@ stream {
         server {{ print .Address ":" .Port }};
   {{- end }} 
     }
-
     server {
         listen 1900 udp;
         proxy_pass unifi-network-discovery-l2;
