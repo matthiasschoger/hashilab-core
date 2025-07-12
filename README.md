@@ -28,9 +28,7 @@ CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keep
 - core-dns - "it's always DNS", but with CoreDNS I can be sure that DNS is always working. Stateless, no moving parts, and spread over the two compute nodes. Robust as hell and does what it's supposed to do. 
 - keepalived - Load-balancer which assigns a floating IP to one of the compute nodes. Assures that the floating IP points to a live node as long as one is available.
 - nfs-csi-contoller - CSI which allows to mount NFS shares from my Synology into Nomad services and assures that only a single alloc is accessing the persistant data on the NAS share.
-- traefik - Reverse proxies which pick up configurations from service annotations and route the traffic to those services. 
-    traefik-home: Also provides Let's Encrypt certificates for all my services.
-    traefik-dmz: Picks up the traffic from cloudflared, checks for suspect patterns with crowdsec and finally routes the traffic to my exposed services.
+- traefik-home: Reverse proxies which pick up configurations from service annotations and route the traffic to those services. Also provides Let's Encrypt certificates for all my services.
 
 <h2>Deployment Notes</h2>
 
