@@ -2,7 +2,10 @@
 
 datacenter = "home"
 data_dir  = "/opt/nomad/data"
-bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/24\" | attr \"address\" }}"
+
+bind_addr = "0.0.0.0"
+
+leave_on_terminate = true
 
 server {
   enabled = true
@@ -11,14 +14,14 @@ server {
 
 client {
   enabled = true
-  servers = ["192.168.0.20", "192.168.0.30", "192.168.0.31"]
+  servers = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
   node_class = "compute"
 
   # required for Vector log scraper
-  host_volume "docker-sock-ro" {
-    path = "/var/run/docker.sock"
-    read_only = true
-  }
+  # host_volume "docker-sock-ro" {
+  #   path = "/var/run/docker.sock"
+  #   read_only = true
+  # }
 }
 
 acl {
@@ -43,7 +46,7 @@ plugin "docker" {
                   "NET_ADMIN","NET_BROADCAST","NET_RAW"] # added to default for the keepalived container
 
     # extra labels for Vector log scraper
-    extra_labels = ["job_name", "task_group_name", "task_name", "namespace", "node_name"]
+    # extra_labels = ["job_name", "task_group_name", "task_name", "namespace", "node_name"]
 
     volumes {
       # required for bind mounting host directories

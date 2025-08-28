@@ -1,15 +1,12 @@
 [Unit]
 Description=Hashicorp Nomad systemd configuration file
 Documentation=https://www.nomadproject.io/docs/
-Wants=network-online.target
+
+Wants=
+Requires=network-online.target remote-fs.target consul.service docker.service
 After=network-online.target
 
 [Service]
-
-# Nomad server should be run as the nomad user. Nomad clients should be run as root
-User=root
-Group=root
-
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/bin/nomad agent -config /etc/nomad.d
 KillMode=process

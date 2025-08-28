@@ -2,12 +2,12 @@
 
 datacenter = "home"
 data_dir = "/opt/consul"
-node_name = "compute2"          # <- change if neccessary
 
-advertise_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/24\" | attr \"address\" }}"
-bind_addr = "0.0.0.0"
+advertise_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
+bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
+client_addr = "0.0.0.0"
 
-retry_join = ["192.168.0.20", "192.168.0.30", "192.168.0.31"]
+retry_join = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
 
 server = true # act as a server with three nodes
 bootstrap_expect=3
