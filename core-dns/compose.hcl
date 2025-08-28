@@ -20,7 +20,7 @@ job "coredns" {
       config {
         # fixed version tag to allow for container caching
         # "latest" will always pull a new container from DockerHub, which would fail if no DNS is available
-        image = "coredns/coredns:1.12.0" 
+        image = "coredns/coredns:1.12.0"  # FIXME: update to 1.12.3
 
         args = ["-conf", "/local/coredns/corefile"]
 
@@ -78,11 +78,12 @@ lab.${var.base_domain}. {
 }
 
 ### resolve "unifi" to ingress gateway for Ubiquiti device adoption
-unifi. {
+### .home is my default internal domain from my DHCP server, adjust as needed
+unifi.home. {
   bind {{ env "NOMAD_IP_dns" }}
 
   hosts {
-    192.168.0.3  unifi
+    192.168.0.3  unifi.home
   }
 
   import headers
