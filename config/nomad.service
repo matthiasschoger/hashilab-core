@@ -8,6 +8,8 @@ After=network-online.target
 
 [Service]
 ExecReload=/bin/kill -HUP $MAINPID
+# wait for IP to be acquired from DHCP
+ExecStartPre=/bin/sleep 5
 ExecStart=/usr/bin/nomad agent -config /etc/nomad.d
 KillMode=process
 KillSignal=SIGINT

@@ -3,7 +3,7 @@
 datacenter = "home"
 data_dir  = "/opt/nomad/data"
 
-bind_addr = "0.0.0.0"
+bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
 
 leave_on_terminate = true
 

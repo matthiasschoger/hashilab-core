@@ -4,8 +4,8 @@ datacenter = "home"
 data_dir = "/opt/consul"
 
 advertise_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
-bind_addr = "0.0.0.0"
-client_addr = "0.0.0.0"
+client_addr = "127.0.0.1 {{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
+bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
 
 retry_join = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
 
