@@ -3,29 +3,17 @@
 datacenter = "home"
 data_dir  = "/opt/nomad/data"
 
-bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"192.168.0.0/16\" | attr \"address\" }}"
-
-leave_on_terminate = true
-
-server {
-  enabled = true
-  bootstrap_expect = 3
-}
+bind_addr = "0.0.0.0"
 
 client {
   enabled = true
   servers = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
-  node_class = "compute"
 
   # required for Vector log scraper
   # host_volume "docker-sock-ro" {
   #   path = "/var/run/docker.sock"
   #   read_only = true
   # }
-}
-
-acl {
-  enabled = true
 }
 
 consul {

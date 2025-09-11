@@ -13,10 +13,11 @@ retry_join = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
 ports {
   grpc = 8502
 }
-
 connect {
   enabled = true
 }
+
+enable_local_script_checks = true
 
 # enable prometheus metrics
 # see https://developer.hashicorp.com/consul/tutorials/kubernetes-features/service-mesh-observability
