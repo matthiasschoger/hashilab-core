@@ -8,9 +8,16 @@ After=network-online.target
 
 [Service]
 ExecReload=/bin/kill -HUP $MAINPID
+
 # wait for IP to be acquired from DHCP
 ExecStartPre=/bin/sleep 5
 ExecStart=/usr/bin/nomad agent -config /etc/nomad.d
+
+# drain node before stopping it
+ExecStop=/usr/bin/nomad node drain -self -enable -ignore-system -no-deadline
+ExecStop=/usr/bin/nomad node eligibility -self -enable
+ExecStop=/bin/kill $MAINPID
+
 KillMode=process
 KillSignal=SIGINT
 LimitNOFILE=65536

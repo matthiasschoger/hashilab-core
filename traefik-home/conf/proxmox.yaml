@@ -3,57 +3,27 @@ http:
     proxmox:
 #      rule: Host(`proxmox.lab.${var.base_domain}`)
       rule: Host(`proxmox.lab.schoger.net`)
-      service: proxmox@file
+      service: proxmox-svc
       entrypoints: websecure
 
   serversTransports:
-    proxmox:
+    insecure_tls:
       insecureSkipVerify: true
 
   services:
-    proxmox:
-      weighted:
-        healthCheck: {}
-        services:
-        - name: proxmox0
-        - name: proxmox1
-        - name: proxmox2
-
-    proxmox0:
+    proxmox-svc:
       loadBalancer:
-        serversTransport: proxmox
-        passHostHeader: true
+        # Sticky sessions required for console access
         sticky:
-          cookie:
-            name: "proxmox_session"
-        healthCheck:
-          interval: 5s
-          timeout: 2s
+         cookie: {}
+        serversTransport: insecure_tls
+        passHostHeader: true
         servers:
           - url: "https://proxmox0.home:8006"
-
-    proxmox1:
-      loadBalancer:
-        serversTransport: proxmox
-        passHostHeader: true
-        sticky:
-          cookie:
-            name: "proxmox_session"
-        healthCheck:
-          interval: 5s
-          timeout: 2s
-        servers:
           - url: "https://proxmox1.home:8006"
-
-    proxmox2:
-      loadBalancer:
-        serversTransport: proxmox
-        passHostHeader: true
-        sticky:
-          cookie:
-            name: "proxmox_session"
-        healthCheck:
-          interval: 5s
-          timeout: 2s
-        servers:
           - url: "https://proxmox2.home:8006"
+        healthcheck:
+          path: "/"
+          interval: "10s"
+          timeout: "2s"
+    
