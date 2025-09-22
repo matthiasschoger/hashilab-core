@@ -1,0 +1,23 @@
+http:
+  middlewares:
+    secHeaders:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        customFrameOptionsValue: "SAMEORIGIN"
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+        contentSecurityPolicy: >-
+          default-src 'self';
+          script-src 'self' https://schoger.net
+          connect-src 'self' https://schoger.net
+          img-src 'self' data: https://schoger.net
+          style-src 'self' 'unsafe-inline';
+          object-src 'none';
+          base-uri 'none';
+          frame-ancestors 'none';
+        customResponseHeaders:
+          server: ""
+          x-powered-by: ""
