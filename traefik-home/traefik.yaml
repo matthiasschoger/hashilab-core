@@ -37,9 +37,8 @@ entryPoints:
           permanent: true
   websecure:      # internal https with LE certificate
     address: :443
+    asDefault: true 
     http:
-      middlewares:
-        - secHeaders@file
       tls:        # wildcard for the whole lab
         domains:    
           - main: lab.schoger.net

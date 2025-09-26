@@ -65,8 +65,7 @@ job "traefik-home" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.traefik.rule=Host(`lab.${var.base_domain}`) || Host(`traefik.lab.${var.base_domain}`)",
-        "traefik.http.routers.traefik.service=api@internal",
-        "traefik.http.routers.traefik.entrypoints=websecure"
+        "traefik.http.routers.traefik.service=api@internal"
       ]
     }
 
