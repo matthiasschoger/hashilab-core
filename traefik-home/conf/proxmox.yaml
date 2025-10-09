@@ -25,5 +25,5 @@ http:
         healthcheck:
           path: "/"
           interval: "10s"
-          timeout: "2s"
+          timeout: "3s"
     
