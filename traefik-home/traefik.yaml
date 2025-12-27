@@ -46,6 +46,8 @@ entryPoints:
               - "*.lab.schoger.net"
         options: strict_tls@file
         certResolver: le  
+      encodedCharacters:
+        allowEncodedSlash: true # Nomad unfortunately uses encoded slashes. Remove when fixed
   traefik:        # Traefik API
     address: :8080
 
