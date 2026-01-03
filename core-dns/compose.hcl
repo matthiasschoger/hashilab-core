@@ -151,8 +151,8 @@ lab.${var.base_domain}.         IN NS	 ns1.lab.${var.base_domain}.
 lab.${var.base_domain}.         IN NS	 ns2.lab.${var.base_domain}.
 
 ; name servers - A records
-ns1                      IN A   192.168.0.30
-ns2                      IN A   192.168.0.31
+ns1                      IN A   192.168.0.21
+ns2                      IN A   192.168.0.22
 
 {{- /*  Point domains to the floating IP from keepalived */}}
 ; services - A records
