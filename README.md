@@ -24,7 +24,7 @@ The "core" repository defines a bare-bone HA setup based on Nomad and Consul (Co
 
 CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keepalived, assigned to one of the two compute nodes. Both compute nodes run an Consul ingress gateway, which picks up the traffic and routes it to traefik-home, where the traffic is finally routed to the target service based on annotations on that service. Super simple once it is set up.
 
-- consul-ingress - Receives the traffic incoming into the cluster and routes it to traefik-home via the Consul Connect Software Define Network. Routing of UDP traffic is handled by NGINX since Consul Connect is unfortunately TCP only.
+- consul-ingress - Receives the traffic to the cluster and routes it to traefik-home via the Consul Connect Software Define Network. Other services like Loki or SMTP are routed directly to the respective services.
 - core-dns - "it's always DNS", but with CoreDNS I can be sure that DNS is always working. Stateless, no moving parts, and spread over the two compute nodes. Robust as hell and does what it's supposed to do. 
 - keepalived - Load-balancer which assigns a floating IP to one of the compute nodes. Assures that the floating IP points to a live node as long as one is available.
 - nfs-csi-contoller - CSI which allows to mount NFS shares from my Synology into Nomad services and assures that only a single alloc is accessing the persistant data on the NAS share.
