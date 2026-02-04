@@ -41,9 +41,10 @@ entryPoints:
     http:
       tls:        # wildcard for the whole lab
         domains:    
-          - main: lab.schoger.net
+          - main: schoger.net
             sans:
               - "*.lab.schoger.net"
+              - "*.schoger.net"
         options: strict_tls@file
         certResolver: le  
       encodedCharacters:
