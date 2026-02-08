@@ -10,6 +10,10 @@ advertise {
 server {
   enabled = true
   bootstrap_expect = 3
+
+  server_join {
+    retry_join = [ "192.168.0.20", "192.168.0.21", "192.168.0.22" ]
+  }
 }
 
 acl {
