@@ -20,7 +20,7 @@ job "coredns" {
       config {
         # fixed version tag to allow for container caching
         # "latest" will always pull a new container from DockerHub, which would fail if no DNS is available
-        image = "coredns/coredns:1.12.0"  # FIXME: update to 1.12.3
+        image = "coredns/coredns:1.14.1"
 
         args = ["-conf", "/local/coredns/corefile"]
 
@@ -55,7 +55,7 @@ job "coredns" {
   prometheus {{ env "NOMAD_ADDR_metrics" }}
 }
 
-### fritz.box to resolve the network printer
+### fritz.box 
 fritz.box. {
   bind {{ env "NOMAD_IP_dns" }}
 
