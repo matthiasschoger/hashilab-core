@@ -27,7 +27,7 @@ certificatesResolvers:
           - "1.0.0.1:53"
 
 entryPoints:
-  web:            # global redirct to https
+  web:              # global redirct to https
     address: :80
     http:
       redirections:
@@ -35,11 +35,11 @@ entryPoints:
           to: websecure
           scheme: https
           permanent: true
-  websecure:      # internal https with LE certificate
+  websecure:        # internal https with LE certificate
     address: :443
-    asDefault: true 
+    asDefault: true # services should use this entrypoint of no specific entrypoint is configured
     http:
-      tls:        # wildcard for the whole lab
+      tls:          # wildcard for the whole lab
         domains:    
           - main: schoger.net
             sans:
@@ -49,7 +49,7 @@ entryPoints:
         certResolver: le  
       encodedCharacters:
         allowEncodedSlash: true # Nomad unfortunately uses encoded slashes. Remove when fixed
-  traefik:        # Traefik API
+  traefik:          # Traefik API
     address: :8080
 
 serversTransport:
