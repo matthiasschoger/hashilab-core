@@ -37,7 +37,7 @@ entryPoints:
           permanent: true
   websecure:        # internal https with LE certificate
     address: :443
-    asDefault: true # services should use this entrypoint of no specific entrypoint is configured
+    asDefault: true # services should use this entrypoint if no specific entrypoint is configured
     http:
       tls:          # wildcard for the whole lab
         domains:    
