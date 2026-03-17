@@ -8,7 +8,6 @@ job "consul-ingress" {
       mode = "bridge"
 
       # NOTE: Remember to add a port allocation to the network block when registering additional listeners!
-      port  "smtp" { static = 25 }
       port  "home-http" { static = 80 }
       port  "home-https" { static = 443 }
       port  "cloudflare-dyndns" { static = 1080 }
@@ -40,15 +39,6 @@ job "consul-ingress" {
 
             # NOTE: Remember to add a port allocation to the network block when registering additional listeners!
 
-            # Protonmail bridge
-            listener {
-              port     = 25
-              protocol = "tcp"
-
-              service {
-                name = "protonmail-smtp"
-              }
-            }
             # Treafik ports
             listener {
               port     = 80
