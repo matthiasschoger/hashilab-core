@@ -33,8 +33,8 @@ plugin "docker" {
     allow_caps = ["audit_write", "chown", "dac_override", "fowner", "fsetid", "kill", "mknod", "net_bind_service", "setfcap", "setgid", "setpcap", "setuid", "sys_chroot",
                   "NET_ADMIN","NET_BROADCAST","NET_RAW"] # added to default for the keepalived container
 
-    # extra labels for Vector log scraper
-    # extra_labels = ["job_name", "task_group_name", "task_name", "namespace", "node_name"]
+    # extra labels for log scraping
+    extra_labels = ["job_name", "task_group_name", "task_name", "namespace", "node_name"]
 
     volumes {
       # required for bind mounting host directories
