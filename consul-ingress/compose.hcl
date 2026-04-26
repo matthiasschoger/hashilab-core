@@ -15,6 +15,7 @@ job "consul-ingress" {
       
       port  "unifi-speedtest" { static = 6789 }
       port  "unifi-inform" { static = 8080 }
+      port  "alloy-ui" { static = 9080 }
 
       port  "envoy_metrics" { to = 9102 }
     }
@@ -91,6 +92,15 @@ job "consul-ingress" {
 
               service {
                 name = "unifi-network-inform"
+              }
+            }
+            # Alloy UI and cluster master
+            listener {
+              port     = 9080
+              protocol = "tcp"
+
+              service {
+                name = "alloy-ui"
               }
             }
           }

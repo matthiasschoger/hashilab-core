@@ -8,12 +8,12 @@ job "csi-nfs" {
       driver = "docker"
 
       config {
-        image = "registry.k8s.io/sig-storage/nfsplugin:v4.13.1"
+        image = "registry.k8s.io/sig-storage/nfsplugin:v4.13.2"
         args = [
-          "--v=5",
           "--nodeid=${attr.unique.hostname}",
           "--endpoint=unix:///csi/csi.sock",
-          "--drivername=nfs.csi.k8s.io"
+          "--drivername=nfs.csi.k8s.io",
+          "--v=2" # log level = warn
         ]
         # node plugins must run as privileged jobs because they
         # mount disks to the host
@@ -48,12 +48,12 @@ job "csi-nfs" {
       driver = "docker"
 
       config {
-        image = "registry.k8s.io/sig-storage/nfsplugin:v4.13.1"
+        image = "registry.k8s.io/sig-storage/nfsplugin:v4.13.2"
         args = [
-          "--v=5",
           "--nodeid=${attr.unique.hostname}",
           "--endpoint=unix:///csi/csi.sock",
-          "--drivername=nfs.csi.k8s.io"
+          "--drivername=nfs.csi.k8s.io",
+          "--v=2" # log level = warn
         ]
       }
 
