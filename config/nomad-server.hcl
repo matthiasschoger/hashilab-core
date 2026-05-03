@@ -20,3 +20,6 @@ acl {
   enabled = true
 }
 
+telemetry {
+  filter_default = true # include raft state metrics
+}
