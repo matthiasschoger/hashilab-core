@@ -8,12 +8,6 @@ bind_addr = "0.0.0.0"
 client {
   enabled = true
   servers = ["192.168.0.20", "192.168.0.21", "192.168.0.22"]
-
-  # required for Vector log scraper
-  # host_volume "docker-sock-ro" {
-  #   path = "/var/run/docker.sock"
-  #   read_only = true
-  # }
 }
 
 consul {
