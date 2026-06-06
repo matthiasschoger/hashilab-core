@@ -35,7 +35,7 @@ entryPoints:
           to: websecure
           scheme: https
           permanent: true
-  websecure:        # internal https with LE certificate
+  websecure:        # internal https with LE certificate and compression
     address: :443
     asDefault: true # services should use this entrypoint if no specific entrypoint is configured
     http:
@@ -47,6 +47,8 @@ entryPoints:
               - "*.schoger.net"
         options: strict_tls@file
         certResolver: le  
+      middlewares:
+        - add-compression@file
       encodedCharacters:
         allowEncodedSlash: true # Nomad unfortunately uses encoded slashes. Remove when fixed
   traefik:          # Traefik API
