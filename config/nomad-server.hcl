@@ -11,6 +11,13 @@ server {
   enabled = true
   bootstrap_expect = 3
 
+  raft_logstore {
+    backend = "wal"
+    wal {
+      segment_size_mb = 64
+    }
+  }
+  
   server_join {
     retry_join = [ "192.168.0.20", "192.168.0.21", "192.168.0.22" ]
   }
