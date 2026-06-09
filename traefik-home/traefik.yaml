@@ -49,6 +49,7 @@ entryPoints:
         certResolver: le  
       middlewares:
         - add-compression@file
+        - default-headers@file
       encodedCharacters:
         allowEncodedSlash: true # Nomad unfortunately uses encoded slashes. Remove when fixed
   traefik:          # Traefik API

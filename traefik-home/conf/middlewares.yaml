@@ -12,3 +12,20 @@ http:
           - application/xml
           - text/plain      
 
+    default-headers:
+      headers:
+        # Enable HTTP Strict Transport Security (HSTS)
+        stsSeconds: 31536000
+        stsPreload: true
+        # X-Content-Type-Options header
+        contentTypeNosniff: true
+        # Prevent browser from running any kind of active content inside the page.
+        frameDeny: true
+        # X-XSS-Protection header to enable browser-based cross-site scripting protection.
+        browserXssFilter: true
+        # Content Security Policy to define allowed sources for content like scripts, images, etc.
+        contentSecurityPolicy: "default-src 'self' 'unsafe-inline' data:; object-src 'none'; frame-ancestors 'none'"
+        # Referrer Policy to limit the amount of information the browser sends as referrer
+        referrerPolicy: "no-referrer-when-downgrade"
+        # Permissions Policy header to restrict features and APIs available in the browser
+        permissionsPolicy: "geolocation=(), microphone=()"          
