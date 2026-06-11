@@ -24,8 +24,7 @@ http:
         # X-XSS-Protection header to enable browser-based cross-site scripting protection.
         browserXssFilter: true
         # Content Security Policy to define allowed sources for content like scripts, images, etc.
-        contentSecurityPolicy: "default-src 'self' 'unsafe-inline' data:; object-src 'none'; frame-ancestors 'none'"
-        # Referrer Policy to limit the amount of information the browser sends as referrer
-        referrerPolicy: "no-referrer-when-downgrade"
+        # Disabled due to issues with Unifi Network
+        contentSecurityPolicy: "default-src 'self' 'unsafe-inline' data:; img-src * data:; object-src 'self'; frame-ancestors 'none'"
         # Permissions Policy header to restrict features and APIs available in the browser
-        permissionsPolicy: "geolocation=(), microphone=()"          
+        permissionsPolicy: "geolocation=(), microphone=()"

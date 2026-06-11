@@ -1,6 +1,6 @@
 tls:
   options:
-    strict_tls:
+    tls_options:
       minVersion: "VersionTLS13"
       sniStrict: true
 
