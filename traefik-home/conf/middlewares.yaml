@@ -12,17 +12,20 @@ http:
           - application/xml
           - text/plain      
 
-    default-headers:
+    security-headers:
       headers:
         customResponseHeaders:
           # Enable HTTP Strict Transport Security (HSTS)
-          stsSeconds: 31536000
           stsPreload: true
+          stsincludesubdomains: true
+          stsSeconds: 31536000
           # X-Content-Type-Options header
           contentTypeNosniff: true
           # Prevent browser from running any kind of active content inside the page.
           frameDeny: true
           # X-XSS-Protection header to enable browser-based cross-site scripting protection.
           browserXssFilter: true
+          customFrameOptionsValue: "SAMEORIGIN"
+          referrerPolicy: "strict-origin-when-cross-origin"
           # Content Security Policy to define allowed sources for content like scripts, images, etc.
           contentSecurityPolicy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src * data:; object-src 'self'; frame-ancestors 'none'"

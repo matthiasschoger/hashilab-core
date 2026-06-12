@@ -49,7 +49,7 @@ entryPoints:
         certResolver: le  
       middlewares:
         - add-compression@file
-        - default-headers@file
+        - security-headers@file
   traefik:          # Traefik API
     address: :8080
 
