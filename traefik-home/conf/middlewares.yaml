@@ -14,16 +14,15 @@ http:
 
     default-headers:
       headers:
-        # Enable HTTP Strict Transport Security (HSTS)
-        stsSeconds: 31536000
-        stsPreload: true
-        # X-Content-Type-Options header
-        contentTypeNosniff: true
-        # Prevent browser from running any kind of active content inside the page.
-        frameDeny: true
-        # X-XSS-Protection header to enable browser-based cross-site scripting protection.
-        browserXssFilter: true
-        # Content Security Policy to define allowed sources for content like scripts, images, etc.
-        contentSecurityPolicy: "default-src 'self' 'unsafe-inline' data:; img-src * data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'self'; frame-ancestors 'none'"
-        # Permissions Policy header to restrict features and APIs available in the browser
-        permissionsPolicy: "geolocation=(), microphone=()"
+        customResponseHeaders:
+          # Enable HTTP Strict Transport Security (HSTS)
+          stsSeconds: 31536000
+          stsPreload: true
+          # X-Content-Type-Options header
+          contentTypeNosniff: true
+          # Prevent browser from running any kind of active content inside the page.
+          frameDeny: true
+          # X-XSS-Protection header to enable browser-based cross-site scripting protection.
+          browserXssFilter: true
+          # Content Security Policy to define allowed sources for content like scripts, images, etc.
+          contentSecurityPolicy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src * data:; object-src 'self'; frame-ancestors 'none'"

@@ -5,10 +5,18 @@ http:
       rule: Host(`proxmox.lab.schoger.net`)
       service: proxmox-svc
       entrypoints: websecure
+      middlewares: 
+        - proxmox-csp
 
   serversTransports:
     insecure_tls:
       insecureSkipVerify: true
+
+  middlewares:
+    proxmox-csp:
+      headers:
+        customResponseHeaders:  # needs to allow iFrame embedding to display the VM console
+          Content-Security-Policy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src * data:; object-src 'self'"
 
   services:
     proxmox-svc:
