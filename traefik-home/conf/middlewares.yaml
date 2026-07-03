@@ -28,4 +28,4 @@ http:
           customFrameOptionsValue: "SAMEORIGIN"
           referrerPolicy: "strict-origin-when-cross-origin"
           # Content Security Policy to define allowed sources for content like scripts, images, etc.
-          content-security-policy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src * data:; object-src 'self'"
+#          content-security-policy: "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; img-src * data:; object-src 'self'"
