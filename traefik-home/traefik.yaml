@@ -47,6 +47,7 @@ entryPoints:
               - "*.schoger.net"
         options: tls_options@file
         certResolver: le  
+      aliasHeadersStrategy: reject  # see https://blog.lrvt.de/hardening-traefik-against-header-alias-spoofing/
       middlewares:
         - add-compression@file
         - security-headers@file
