@@ -28,7 +28,7 @@ CoreDNS resolves requests to *.lab.domain.tld to the floating IP managed by keep
 
 - consul-ingress - Receives the traffic to the cluster and routes it to traefik-home via the Consul Connect Software Define Network. Other services like Loki or SMTP are routed directly to the respective services.
 - core-dns - "it's always DNS", but with CoreDNS I can be sure that DNS is always working. Stateless, no moving parts, and spread over the two compute nodes. Robust as hell and does what it's supposed to do.
-- keepalived - Load-balancer which assigns a floating IP to one of the compute nodes. Assures that the floating IP points to a live node as long as one is available. In addition, I did a little magic in the Traefik job to write the node id to the Consul CV store. If keepalived is on the same node, the instance get's a higher prio. This ensures that ingress and Traefik are placed on the same machine.
+- keepalived - Load-balancer which assigns a floating IP to one of the compute nodes. Assures that the floating IP points to a live node as long as one is available. In addition, I did a little bit of magic in the Traefik job to write the Nomad node id to the Consul CV store. If the keepalived instance is on the same node, it get's a higher prio. This ensures that ingress and Traefik are placed on the same machine.
 - nfs-csi-contoller - CSI which allows to mount NFS shares from my Synology into Nomad services and assures that only a single alloc is accessing the persistant data on the NAS share.
 - traefik-home: Reverse proxy which picks up configurations from service annotations and routes the traffic to those services. Also provides Let's Encrypt certificates for all my services.
 
