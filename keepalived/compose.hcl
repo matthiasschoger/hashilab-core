@@ -8,39 +8,41 @@ job "keepalived" {
       driver = "docker"
 
       config {
-        image = "osixia/keepalived:2.0.20"
         network_mode = "host"
 
+        image = "shawly/keepalived:2.3.1"
+
         volumes = [
-            "local/keepalived/:/container/environment/01-custom"
+            "local/keepalived.conf:/etc/keepalived/keepalived.conf"
         ]
 
         cap_add = ["NET_ADMIN", "NET_BROADCAST", "NET_RAW"]
       }
 
-      # FIXME: filter for only nodes with datacenter = "home"
-      # {{- if eq .Datacenter "home" }} # does not work since Consul only has one DC
-      # https://developer.hashicorp.com/nomad/api-docs/nodes
-      template {
-        destination = "local/keepalived/env.yaml"
-        data        = <<EOH
-KEEPALIVED_INTERFACE: {{ sockaddr "GetPrivateInterfaces | include \"network\" \"192.168.0.0/24\" | attr \"name\"" }}
-KEEPALIVED_UNICAST_PEERS:
-{{- with $node := node -}}
-{{ range nodes }}
-{{- if ne .Address $node.Node.Address }}
-  - {{ .Address }}
-{{- end -}}
-{{- end -}}
-{{- end }}
+      env {
+        KEEPALIVED_CUSTOM_CONFIG = true # use config at /etc/keepalived/keepalived.conf instead of env
 
-KEEPALIVED_VIRTUAL_IPS:
-  - 192.168.0.3/24
-EOH
+        TZ = "Europe/Berlin"
       }
 
-      env {
-        TZ = "Europe/Berlin"
+      template {
+        destination = "local/keepalived.conf"
+        change_mode = "restart"   # restart container when the key flips to another node
+        data        = <<EOH
+{{- $myNode := env "node.unique.id" -}}
+{{- $traefikNode := keyOrDefault "traefik-host-id" "" -}}
+vrrp_instance VI_HOMELAB {
+    interface {{ sockaddr "GetPrivateInterfaces | include \"network\" \"192.168.0.0/24\" | attr \"name\"" }}
+
+    virtual_router_id 51
+    priority {{ if eq $myNode $traefikNode }}150{{ else }}100{{ end }}
+    advert_int 1
+
+    virtual_ipaddress {
+        192.168.0.3/24
+    }
+}
+EOH
       }
 
       resources {

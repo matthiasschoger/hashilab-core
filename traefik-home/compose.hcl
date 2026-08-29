@@ -165,5 +165,27 @@ EOH
         cpu    = 400
       }
     }
+
+    # Fires every time the "traefik" task starts or restarts on a node,
+    # including on reschedules — so the KV always reflects current placement.
+    task "register-node-id" {
+      lifecycle {
+        hook    = "poststart"
+        sidecar = false
+      }
+
+      driver = "docker"
+
+      env {
+        NODE_ID = "${node.unique.id}"
+      }
+
+      config {
+        image        = "hashicorp/consul:latest"
+        network_mode = "host"
+        entrypoint   = ["/bin/sh", "-c"]
+        command      = "consul kv put traefik-host-id \"$NODE_ID\""
+      }
+    }    
   }
 }
