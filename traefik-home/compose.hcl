@@ -181,7 +181,7 @@ EOH
       }
 
       config {
-        image        = "hashicorp/consul:latest"
+        image        = "hashicorp/consul:2.0.3"
         network_mode = "host"
         entrypoint   = ["/bin/sh", "-c"]
         command      = "consul kv put traefik-host-id \"$NODE_ID\""
