@@ -1,0 +1,27 @@
+# Register volume with
+#  nomad volume register example.volume
+type      = "csi"
+id        = "example-data"
+name      = "example-data"
+plugin_id = "csi-iscsi"
+
+capacity_min = "1GiB"
+capacity_max = "20GiB"
+
+capability {
+  access_mode     = "single-node-writer"
+  attachment_mode = "file-system"
+}
+
+mount_options {
+  fs_type     = "btrfs"
+  mount_flags = ["noatime"]
+}
+
+context = {
+  node_attach_driver = "iscsi"
+  provisioner_driver = "csi-iscsi"
+  portal             = "<synology-ip-or-hostname>:3260"
+  iqn                = "iqn.2000-01.com.synology:<your-target-name>"
+  lun                = "0"
+}
