@@ -21,7 +21,7 @@ mount_options {
 context = {
   node_attach_driver = "iscsi"
   provisioner_driver = "csi-iscsi"
-  portal             = "<synology-ip-or-hostname>:3260"
+  portal             = "storage.home:3260"
   iqn                = "iqn.2000-01.com.synology:<your-target-name>"
   lun                = "0"
 }
