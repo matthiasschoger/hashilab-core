@@ -3,10 +3,10 @@
 type      = "csi"
 id        = "example-data"
 name      = "example-data"
-plugin_id = "csi-iscsi"
+plugin_id = "iscsi"
 
 capacity_min = "1GiB"
-capacity_max = "20GiB"
+capacity_max = "2GiB"
 
 capability {
   access_mode     = "single-node-writer"
@@ -18,10 +18,10 @@ mount_options {
   mount_flags = ["noatime"]
 }
 
-context = {
-  node_attach_driver = "iscsi"
-  provisioner_driver = "csi-iscsi"
-  portal             = "storage.home:3260"
-  iqn                = "iqn.2000-01.com.synology:<your-target-name>"
-  lun                = "0"
-}
+# context = {
+#   node_attach_driver = "iscsi"
+#   provisioner_driver = "csi-iscsi"
+#   portal             = "storage.home:3260"
+#   iqn                = "iqn.2000-01.com.synology:<your-target-name>"
+#   lun                = "0"
+# }
