@@ -16,7 +16,7 @@ job "csi-iscsi" {
           "--csi-version=1.5.0",
           "--csi-name=org.democratic-csi.synology-iscsi",
           "--driver-config-file=${NOMAD_SECRETS_DIR}/driver-config-file.yaml",
-          "--log-level=info",
+          "--log-level=warn",
           "--csi-mode=node",
           "--server-socket=/csi-data/csi.sock",
         ]
@@ -34,6 +34,10 @@ job "csi-iscsi" {
           source   = "/run/udev"
           readonly = true
         }
+      }
+
+      env {
+        TZ = "Europe/Berlin"
       }
 
       csi_plugin {
@@ -84,11 +88,15 @@ EOH
           "--csi-version=1.5.0",
           "--csi-name=org.democratic-csi.synology-iscsi",
           "--driver-config-file=${NOMAD_SECRETS_DIR}/driver-config-file.yaml",
-          "--log-level=info",
+          "--log-level=warn",
           "--csi-mode=controller",
           "--server-socket=/csi-data/csi.sock",
           "--server-address=0.0.0.0",
           "--server-port=9000",        ]
+      }
+
+      env {
+        TZ = "Europe/Berlin"
       }
 
       csi_plugin {
